@@ -137,7 +137,7 @@ ${formatSlotsText(slots)}
 📦 <b>Barang:</b> ${booking.equipment_name} (${booking.equipment_code}) × ${booking.quantity}
 👤 <b>Nama:</b> ${booking.borrower_name}
 🏢 <b>Jabatan/Kelab:</b> ${booking.department || '-'}
-📞 <b>Telefon:</b> ${booking.phone}
+📞 <b>Telefon:</b> ${booking.phone_number}
 ${booking.expected_return_date ? `📅 <b>Jangka Pulang:</b> ${booking.expected_return_date}` : ''}
 📌 <b>Status:</b> Menunggu Kelulusan
     `.trim()

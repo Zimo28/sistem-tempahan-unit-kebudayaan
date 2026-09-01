@@ -23,7 +23,7 @@ export default function BorrowPage() {
   const [success, setSuccess] = useState(false)
 
   const [form, setForm] = useState({
-    equipment_id: '', quantity: '1', borrower_name: '', department: '', phone: '',
+    equipment_id: '', quantity: '1', borrower_name: '', department: '', phone_number: '',
     expected_return_date: '', notes: '',
   })
 
@@ -39,7 +39,7 @@ export default function BorrowPage() {
   const selectedEquipment = equipment.find(e => e.id === form.equipment_id)
 
   const handleSubmit = async () => {
-    if (!form.equipment_id || !form.borrower_name.trim() || !form.phone.trim()) {
+    if (!form.equipment_id || !form.borrower_name.trim() || !form.phone_number.trim()) {
       showToast('Sila lengkapkan borang: equipment, nama, dan telefon.', 'error')
       return
     }
@@ -55,7 +55,7 @@ export default function BorrowPage() {
       quantity: qty,
       borrower_name: form.borrower_name.trim(),
       department: form.department.trim() || null,
-      phone: form.phone.trim(),
+      phone_number: form.phone_number.trim(),
       expected_return_date: form.expected_return_date || null,
       notes: form.notes.trim() || null,
       status: 'pending',
@@ -76,7 +76,7 @@ export default function BorrowPage() {
             quantity: qty,
             borrower_name: form.borrower_name.trim(),
             department: form.department.trim(),
-            phone: form.phone.trim(),
+            phone_number: form.phone_number.trim(),
             expected_return_date: form.expected_return_date,
           },
         }),
@@ -200,8 +200,8 @@ export default function BorrowPage() {
 
           <div style={{ marginBottom: '16px' }}>
             <label style={labelStyle}>No. Telefon <span style={{ color: '#dc2626' }}>*</span></label>
-            <input type="text" placeholder="012-3456789" value={form.phone}
-              onChange={(e) => setForm(p => ({ ...p, phone: e.target.value }))} style={inputStyle} />
+            <input type="text" placeholder="012-3456789" value={form.phone_number}
+              onChange={(e) => setForm(p => ({ ...p, phone_number: e.target.value }))} style={inputStyle} />
           </div>
 
           <div style={{ marginBottom: '16px' }}>

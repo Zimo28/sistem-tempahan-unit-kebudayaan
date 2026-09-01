@@ -814,7 +814,7 @@ export default function SettingsClient({
                   onFocus={(e) => e.target.style.borderColor = '#8B0000'} onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
               </div>
               <div>
-                <label style={labelStyle}>Phone</label>
+                <label style={labelStyle}>phone_number</label>
                 <input type="text" value={settings['contact_phone'] ?? ''} onChange={(e) => updateSetting('contact_phone', e.target.value)} style={inputStyle}
                   onFocus={(e) => e.target.style.borderColor = '#8B0000'} onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
               </div>

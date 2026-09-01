@@ -261,11 +261,11 @@ export default function LinksClient({ links: initialLinks, settings: initialSett
                 </select>
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
-                <label style={labelStyle}>Description (subtitle bawah title, opsyenal)</label>
+                <label style={labelStyle}>Description (subtitle bawah title, optional)</label>
                 <input type="text" value={newLink.description} onChange={(e) => setNewLink(p => ({ ...p, description: e.target.value }))} style={inputStyle} placeholder="cth: Manual & panduan penggunaan" />
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
-                <label style={labelStyle}>Custom Icon (opsyenal, overrides preset)</label>
+                <label style={labelStyle}>Custom Icon (optional, overrides preset)</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   {newLink.custom_icon_url && (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -316,7 +316,7 @@ export default function LinksClient({ links: initialLinks, settings: initialSett
                   <div style={{ display: 'flex', gap: '8px', flex: 1, flexWrap: 'wrap', alignItems: 'center' }}>
                     <input value={editValue.title} onChange={(e) => setEditValue(p => ({ ...p, title: e.target.value }))} style={{ ...inputStyle, flex: 1, minWidth: '120px' }} placeholder="Title" />
                     <input value={editValue.url} onChange={(e) => setEditValue(p => ({ ...p, url: e.target.value }))} style={{ ...inputStyle, flex: 1, minWidth: '140px' }} placeholder="URL" />
-                    <input value={editValue.description} onChange={(e) => setEditValue(p => ({ ...p, description: e.target.value }))} style={{ ...inputStyle, flex: 1, minWidth: '160px' }} placeholder="Description (opsyenal)" />
+                    <input value={editValue.description} onChange={(e) => setEditValue(p => ({ ...p, description: e.target.value }))} style={{ ...inputStyle, flex: 1, minWidth: '160px' }} placeholder="Description (optional)" />
                     <select value={editValue.icon_key} onChange={(e) => setEditValue(p => ({ ...p, icon_key: e.target.value }))} style={{ ...inputStyle, width: '130px', cursor: 'pointer' }}>
                       {iconOptions.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
                     </select>

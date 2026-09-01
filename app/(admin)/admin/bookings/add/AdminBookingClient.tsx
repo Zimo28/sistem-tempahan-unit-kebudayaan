@@ -12,25 +12,34 @@ type Venue = {
   code: string
 }
 
+type EquipmentOption = {
+  id: string
+  label: string
+  max_quantity: number
+}
+
 type Slot = {
   booking_date: string
   start_time: string
   end_time: string
-  microphone: number
-  aircond: number
-  pa_system: number
-  lcd_projector: number
+  equipment: Record<string, number> // option_id -> quantity
 }
 
 const emptySlot = (): Slot => ({
-  booking_date: '', start_time: '', end_time: '',
-  microphone: 0, aircond: 0, pa_system: 0, lcd_projector: 0,
+  booking_date: '', start_time: '', end_time: '', equipment: {},
 })
 
-function EquipmentSelect({ eq, value, onChange }: { 
-  eq: { label: string; field: string; icon: React.ReactNode; max: number }
+const genericEquipmentIcon = (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+  </svg>
+)
+
+function EquipmentSelect({ label, max, value, onChange }: {
+  label: string
+  max: number
   value: number
-  onChange: (val: number) => void 
+  onChange: (val: number) => void
 }) {
   const [open, setOpen] = useState(false)
 
@@ -38,10 +47,10 @@ function EquipmentSelect({ eq, value, onChange }: {
     <div style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px', background: '#f9fafb', position: 'relative' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
         <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          {eq.icon} {eq.label}
+          {genericEquipmentIcon} {label}
         </span>
         <span style={{ fontSize: '10px', color: '#3b82f6', background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)', padding: '1px 6px', borderRadius: '4px', fontWeight: '600' }}>
-          MAX {eq.max}
+          MAX {max}
         </span>
       </div>
       <button
@@ -70,8 +79,9 @@ function EquipmentSelect({ eq, value, onChange }: {
         transition: 'all 0.2s ease',
         boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
         pointerEvents: open ? 'auto' : 'none',
+        overflowY: 'auto',
       }}>
-        {Array.from({ length: eq.max + 1 }, (_, i) => (
+        {Array.from({ length: max + 1 }, (_, i) => (
           <button
             key={i} type="button"
             onClick={() => { onChange(i); setOpen(false) }}
@@ -80,7 +90,7 @@ function EquipmentSelect({ eq, value, onChange }: {
               background: value === i ? '#fef2f2' : 'transparent',
               color: value === i ? '#8B0000' : '#6b7280',
               border: 'none', cursor: 'pointer', textAlign: 'left',
-              borderBottom: i < eq.max ? '1px solid #f3f4f6' : 'none',
+              borderBottom: i < max ? '1px solid #f3f4f6' : 'none',
               transition: 'background 0.15s',
             }}
             onMouseEnter={(e) => { if (value !== i) e.currentTarget.style.background = '#f9fafb' }}
@@ -97,8 +107,9 @@ export default function AdminBookingClient() {
   const [file, setFile] = useState<File | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const [venues, setVenues] = useState<Venue[]>([])
+  const [equipmentOptions, setEquipmentOptions] = useState<EquipmentOption[]>([])
   const [form, setForm] = useState({
-    full_name: '', phone: '', organization: '', event_name: '', venue_id: '',
+    full_name: '', phone_number: '', organization: '', event_name: '', venue_id: '',
   })
   const [slots, setSlots] = useState<Slot[]>([emptySlot()])
 
@@ -116,12 +127,26 @@ export default function AdminBookingClient() {
       })
   }, [])
 
+  useEffect(() => {
+    if (!form.venue_id) { setEquipmentOptions([]); return }
+    supabase
+      .from('venue_equipment_options')
+      .select('id, label, max_quantity')
+      .eq('venue_id', form.venue_id)
+      .order('position', { ascending: true })
+      .then(({ data }) => setEquipmentOptions(data ?? []))
+  }, [form.venue_id])
+
   const updateForm = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }))
   }
 
-  const updateSlot = (index: number, field: keyof Slot, value: string | number) => {
+  const updateSlot = (index: number, field: 'booking_date' | 'start_time' | 'end_time', value: string) => {
     setSlots(prev => prev.map((s, i) => i === index ? { ...s, [field]: value } : s))
+  }
+
+  const updateSlotEquipment = (index: number, optionId: string, value: number) => {
+    setSlots(prev => prev.map((s, i) => i === index ? { ...s, equipment: { ...s.equipment, [optionId]: value } } : s))
   }
 
   const addSlot = () => {
@@ -161,13 +186,13 @@ export default function AdminBookingClient() {
       showToast('Sila pilih tempat/venue.', 'error')
       return
     }
-    if (!form.full_name || !form.phone || !form.organization || !form.event_name) {
+    if (!form.full_name || !form.phone_number || !form.organization || !form.event_name) {
       showToast('Sila isi semua maklumat peribadi.', 'error')
       return
     }
 
     const phoneRegex = /^(\+?60|0)[0-9]{8,10}$/
-    if (!phoneRegex.test(form.phone.replace(/[-\s]/g, ''))) {
+    if (!phoneRegex.test(form.phone_number.replace(/[-\s]/g, ''))) {
       showToast('Format nombor telefon tidak sah. Contoh: 012-3456789', 'error')
       return
     }
@@ -210,8 +235,18 @@ export default function AdminBookingClient() {
     setLoading(true)
     const groupId = crypto.randomUUID()
     const rowsToInsert = slots.map(slot => ({
-      ...form,
-      ...slot,
+      full_name: form.full_name,
+      phone_number: form.phone_number,
+      organization: form.organization,
+      event_name: form.event_name,
+      venue_id: form.venue_id,
+      booking_date: slot.booking_date,
+      start_time: slot.start_time,
+      end_time: slot.end_time,
+      microphone: 0,
+      aircond: 0,
+      pa_system: 0,
+      lcd_projector: 0,
       status: 'approved',
       booking_group_id: groupId,
     }))
@@ -223,6 +258,20 @@ export default function AdminBookingClient() {
       showToast('Ralat semasa menambah tempahan.', 'error')
       setLoading(false)
       return
+    }
+
+    if (inserted) {
+      const equipmentRows: { booking_id: string; option_id: string; quantity: number }[] = []
+      slots.forEach((slot, i) => {
+        const bookingId = inserted[i]?.id
+        if (!bookingId) return
+        Object.entries(slot.equipment).forEach(([optionId, qty]) => {
+          if (qty > 0) equipmentRows.push({ booking_id: bookingId, option_id: optionId, quantity: qty })
+        })
+      })
+      if (equipmentRows.length > 0) {
+        await supabase.from('booking_equipment_requests').insert(equipmentRows)
+      }
     }
 
     if (inserted?.[0]) {
@@ -269,13 +318,6 @@ export default function AdminBookingClient() {
     padding: '28px',
     boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
   }
-
-  const equipmentDefs = [
-    { label: 'Microphone', field: 'microphone' as const, icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>, max: 2 },
-    { label: 'Air-cond', field: 'aircond' as const, icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>, max: 1 },
-    { label: 'PA System', field: 'pa_system' as const, icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>, max: 1 },
-    { label: 'LCD Projector', field: 'lcd_projector' as const, icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><path d="M17 2l-5 5-5-5"/></svg>, max: 1 },
-  ]
 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
@@ -336,7 +378,7 @@ export default function AdminBookingClient() {
           </div>
           {[
             { label: 'Full Name', field: 'full_name', placeholder: 'Enter full name', type: 'text' },
-            { label: 'Phone Number', field: 'phone', placeholder: 'e.g. 012-345-6789', type: 'tel' },
+            { label: 'phone_number Number', field: 'phone_number', placeholder: 'e.g. 012-345-6789', type: 'tel' },
             { label: 'Club / Organization Name', field: 'organization', placeholder: 'Enter club or organization name', type: 'text' },
             { label: 'Event Name', field: 'event_name', placeholder: 'Enter the name of the event', type: 'text' },
           ].map((item) => (
@@ -401,16 +443,23 @@ export default function AdminBookingClient() {
               </div>
 
               <label style={{ ...labelStyle, marginBottom: '10px' }}>Additional Equipment</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                {equipmentDefs.map((eq) => (
-                  <EquipmentSelect
-                    key={eq.field}
-                    eq={eq}
-                    value={slot[eq.field]}
-                    onChange={(val) => updateSlot(index, eq.field, val)}
-                  />
-                ))}
-              </div>
+              {equipmentOptions.length > 0 ? (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  {equipmentOptions.map((opt) => (
+                    <EquipmentSelect
+                      key={opt.id}
+                      label={opt.label}
+                      max={opt.max_quantity}
+                      value={slot.equipment[opt.id] ?? 0}
+                      onChange={(val) => updateSlotEquipment(index, opt.id, val)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p style={{ fontSize: '12px', color: '#9ca3af' }}>
+                  {form.venue_id ? 'Tiada equipment tersedia untuk venue ini.' : 'Pilih venue dahulu untuk lihat equipment.'}
+                </p>
+              )}
             </div>
           ))}
 
