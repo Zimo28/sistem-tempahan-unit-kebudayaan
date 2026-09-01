@@ -32,7 +32,7 @@ type Loan = {
   booking_id: string | null
   borrower_name: string
   department: string | null
-  phone: string | null
+  phone_number: string | null
   checkout_date: string
   expected_return_date: string | null
   actual_return_date: string | null
@@ -158,7 +158,7 @@ export default function EquipmentClient({
 
   // ---- Loan state ----
   const [showAddLoan, setShowAddLoan] = useState(false)
-  const [newLoan, setNewLoan] = useState({ equipment_id: '', borrower_name: '', department: '', phone: '', expected_return_date: '', quantity: '1' })
+  const [newLoan, setNewLoan] = useState({ equipment_id: '', borrower_name: '', department: '', phone_number: '', expected_return_date: '', quantity: '1' })
 
   // ---- Maintenance state ----
   const [showAddMaintenance, setShowAddMaintenance] = useState(false)
@@ -339,7 +339,7 @@ export default function EquipmentClient({
         equipment_id: newLoan.equipment_id,
         borrower_name: newLoan.borrower_name.trim(),
         department: newLoan.department.trim() || null,
-        phone: newLoan.phone.trim() || null,
+        phone_number: newLoan.phone_number.trim() || null,
         checkout_date: todayStr,
         expected_return_date: newLoan.expected_return_date || null,
         quantity: qty,
@@ -354,7 +354,7 @@ export default function EquipmentClient({
         const newAvail = Math.max(0, e.available_quantity - qty)
         return { ...e, available_quantity: newAvail, status: newAvail <= 0 ? 'borrowed' : e.status }
       }))
-      setNewLoan({ equipment_id: '', borrower_name: '', department: '', phone: '', expected_return_date: '', quantity: '1' })
+      setNewLoan({ equipment_id: '', borrower_name: '', department: '', phone_number: '', expected_return_date: '', quantity: '1' })
       setShowAddLoan(false)
       showToast('Loan recorded successfully!', 'success')
     } else {
@@ -774,8 +774,8 @@ export default function EquipmentClient({
                   <input type="text" value={newLoan.department} onChange={(e) => setNewLoan(p => ({ ...p, department: e.target.value }))} style={inputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}>Phone Number</label>
-                  <input type="text" value={newLoan.phone} onChange={(e) => setNewLoan(p => ({ ...p, phone: e.target.value }))} style={inputStyle} />
+                  <label style={labelStyle}>phone_number Number</label>
+                  <input type="text" value={newLoan.phone_number} onChange={(e) => setNewLoan(p => ({ ...p, phone_number: e.target.value }))} style={inputStyle} />
                 </div>
                 <div>
                   <label style={labelStyle}>Expected Return Date</label>
@@ -804,7 +804,7 @@ export default function EquipmentClient({
                       <p style={{ fontSize: '13px', fontWeight: '600', color: '#111827' }}>{loan.equipment?.name ?? '-'} <span style={{ fontWeight: 400, color: '#6b7280' }}>× {loan.quantity} → {loan.borrower_name}</span></p>
                       <p style={{ fontSize: '11px', color: '#9ca3af' }}>
                         {loan.department && `${loan.department} · `}
-                        {loan.phone && `${loan.phone} · `}
+                        {loan.phone_number && `${loan.phone_number} · `}
                         Checked out: {loan.checkout_date}
                         {loan.expected_return_date && ` · Expected return: ${loan.expected_return_date}`}
                         {loan.actual_return_date && ` · Returned: ${loan.actual_return_date}`}

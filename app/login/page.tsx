@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { showToast } from '@/components/Toast'
 
-const DOMAIN = '@minitheater.com'
+const DOMAIN = '@unitkebudayaan.com'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')

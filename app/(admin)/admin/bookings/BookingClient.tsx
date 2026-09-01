@@ -11,7 +11,7 @@ type Booking = {
   id: string
   booking_group_id?: string | null
   full_name: string
-  phone: string
+  phone_number: string
   organization: string
   event_name: string
   booking_date: string
@@ -45,7 +45,7 @@ type BookingGroup = {
   full_name: string
   organization: string
   event_name: string
-  phone: string
+  phone_number: string
   status: string
   created_at: string
   attachment_url?: string
@@ -145,7 +145,7 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
         full_name: first.full_name,
         organization: first.organization,
         event_name: first.event_name,
-        phone: first.phone,
+        phone_number: first.phone_number,
         status: first.status,
         created_at: first.created_at,
         attachment_url: first.attachment_url,
@@ -383,7 +383,7 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
             <p class="section-title">Maklumat Pemohon</p>
             <div class="grid">
               <div class="field"><label>Nama Penuh</label><p>${booking.full_name}</p></div>
-              <div class="field"><label>No. Telefon</label><p>${booking.phone}</p></div>
+              <div class="field"><label>No. Telefon</label><p>${booking.phone_number}</p></div>
               <div class="field"><label>Organisasi / Kelab</label><p>${booking.organization}</p></div>
               <div class="field"><label>Nama Program / Event</label><p>${booking.event_name}</p></div>
             </div>
@@ -490,7 +490,7 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
             { label: 'Event Name', value: group.event_name, highlight: true },
             { label: 'Venue', value: group.venue_name, highlight: true },
             { label: 'Organization', value: group.organization },
-            { label: 'Full Name / Phone', value: `${primary.full_name}\n${primary.phone}` },
+            { label: 'Full Name / Phone', value: `${primary.full_name}\n${primary.phone_number}` },
             { label: isMulti ? 'Total Slots' : 'Booking Date & Time', value: isMulti ? `${group.slots.length} hari/slot` : `${new Date(primary.booking_date + 'T00:00:00').toLocaleDateString('en-MY', { day: 'numeric', month: 'long', year: 'numeric' })} | ${primary.start_time} - ${primary.end_time}` },
           ].map((item) => (
             <div key={item.label}>
@@ -745,7 +745,10 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
                 border: filter === tab.value ? '1px solid #8B0000' : '1px solid #e5e7eb',
                 background: filter === tab.value ? '#8B0000' : 'white',
                 color: filter === tab.value ? 'white' : '#6b7280',
-                transition: 'all 0.15s',
+                transition: 'background 0.15s, color 0.15s, border-color 0.15s',
+                minWidth: '104px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                whiteSpace: 'nowrap',
               }}
             >
               {tab.label}
@@ -780,7 +783,7 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
               const approved = bookings.filter(b => b.status === 'approved')
               if (approved.length === 0) { showToast('Tiada tempahan approved untuk export.', 'warning'); return }
               const headers = ['ID', 'Group ID', 'Venue', 'Full Name', 'Phone', 'Organization', 'Event Name', 'Booking Date', 'Start Time', 'End Time', 'Microphone', 'Air-cond', 'PA System', 'LCD Projector', 'Status', 'Created At']
-              const rows = approved.map(b => [b.id, b.booking_group_id ?? '', b.venues?.name ?? '', b.full_name, b.phone, b.organization, b.event_name, b.booking_date, b.start_time, b.end_time, b.microphone, b.aircond, b.pa_system, b.lcd_projector, b.status, b.created_at])
+              const rows = approved.map(b => [b.id, b.booking_group_id ?? '', b.venues?.name ?? '', b.full_name, b.phone_number, b.organization, b.event_name, b.booking_date, b.start_time, b.end_time, b.microphone, b.aircond, b.pa_system, b.lcd_projector, b.status, b.created_at])
               const csv = [headers, ...rows].map(r => r.join(',')).join('\n')
               const blob = new Blob([csv], { type: 'text/csv' })
               const url = URL.createObjectURL(blob)
