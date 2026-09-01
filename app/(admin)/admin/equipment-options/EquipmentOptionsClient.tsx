@@ -22,8 +22,8 @@ export default function EquipmentOptionsClient({ venues, options: initialOptions
   const [selectedVenueId, setSelectedVenueId] = useState(venues[0]?.id ?? '')
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editValue, setEditValue] = useState({ label: '', max_quantity: '1' })
-  const [newOption, setNewOption] = useState({ label: '', max_quantity: '1' })
+  const [editValue, setEditValue] = useState({ label: '', max_quantity: '10' })
+  const [newOption, setNewOption] = useState({ label: '', max_quantity: '10' })
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const venueOptions = options
@@ -116,7 +116,7 @@ export default function EquipmentOptionsClient({ venues, options: initialOptions
   return (
     <div style={{ maxWidth: '700px', margin: '0 auto' }}>
       <div style={{ marginBottom: '20px' }}>
-        <h1 style={{ fontSize: '26px', fontWeight: '700', color: '#111827', letterSpacing: '-0.5px' }}>Equipment Options per Venue</h1>
+        <h1 style={{ fontSize: '26px', fontWeight: '700', color: '#111827', letterSpacing: '-0.5px' }}>Equipment Options</h1>
         <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '4px' }}>
           Tentukan senarai equipment (dan max quantity) yang boleh diminta dalam borang tempahan, ikut venue.
         </p>
