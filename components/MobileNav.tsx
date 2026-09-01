@@ -437,13 +437,13 @@ export default function MobileNav({ userName }: { userName: string }) {
       <div style={{
         background: 'white',
         borderBottom: '1px solid #f3f4f6',
-        padding: '8px',
+        padding: '8px 8px 12px',
         position: 'sticky',
         top: '56px',
         zIndex: 49,
         boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
         overflow: 'hidden',
-        maxHeight: menuOpen ? '400px' : '0',
+        maxHeight: menuOpen ? '460px' : '0',
         opacity: menuOpen ? 1 : 0,
         transition: 'max-height 0.3s ease, opacity 0.2s ease',
       }}>
@@ -505,7 +505,7 @@ export default function MobileNav({ userName }: { userName: string }) {
         })}
 
         {/* Divider */}
-        <div style={{ borderTop: '1px solid #f3f4f6', margin: '6px 0' }} />
+        <div style={{ borderTop: '1px solid #f3f4f6', margin: '8px 0 6px' }} />
 
         {/* Profile */}
         <Link
@@ -513,10 +513,11 @@ export default function MobileNav({ userName }: { userName: string }) {
           onClick={() => setMenuOpen(false)}
           style={{
             display: 'flex', alignItems: 'center', gap: '10px',
-            padding: '9px 12px', borderRadius: '8px',
+            padding: '10px 12px', borderRadius: '8px',
             fontSize: '13.5px', fontWeight: '400',
             color: '#4b5563', textDecoration: 'none',
             borderLeft: '3px solid transparent',
+            marginBottom: '2px',
             transition: 'all 0.15s',
           }}
         >
@@ -528,32 +529,34 @@ export default function MobileNav({ userName }: { userName: string }) {
           Profile
         </Link>
 
-        {/* Logout */}
-        <button
-          onClick={handleLogout}
-          style={{
-            width: '100%',
-            padding: '9px 12px',
-            borderRadius: '8px',
-            border: 'none',
-            background: 'transparent',
-            color: '#9ca3af',
-            fontSize: '13.5px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            borderLeft: '3px solid transparent',
-            transition: 'all 0.15s',
-          }}
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          Log Keluar
-        </button>
+        {/* Logout — separated visually with its own top border + extra bottom space so it isn't cramped against the container edge */}
+        <div style={{ borderTop: '1px solid #f9fafb', paddingTop: '4px', marginTop: '2px' }}>
+          <button
+            onClick={handleLogout}
+            style={{
+              width: '100%',
+              padding: '12px',
+              borderRadius: '8px',
+              border: 'none',
+              background: 'transparent',
+              color: '#dc2626',
+              fontSize: '13.5px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              transition: 'background 0.15s',
+            }}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Log Keluar
+          </button>
+        </div>
       </div>
 
       <style>{`
