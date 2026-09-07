@@ -112,6 +112,7 @@ export default function AdminBookingClient() {
     full_name: '', phone_number: '', organization: '', event_name: '', venue_id: '',
   })
   const [slots, setSlots] = useState<Slot[]>([emptySlot()])
+  const [expandedSlotIndex, setExpandedSlotIndex] = useState<number | null>(0)
 
   useEffect(() => {
     supabase
@@ -150,11 +151,20 @@ export default function AdminBookingClient() {
   }
 
   const addSlot = () => {
-    setSlots(prev => [...prev, emptySlot()])
+    setSlots(prev => {
+      const next = [...prev, emptySlot()]
+      setExpandedSlotIndex(next.length - 1)
+      return next
+    })
   }
 
   const removeSlot = (index: number) => {
     setSlots(prev => prev.filter((_, i) => i !== index))
+    setExpandedSlotIndex(prev => {
+      if (prev === null) return null
+      if (prev === index) return null
+      return prev > index ? prev - 1 : prev
+    })
   }
 
   const uploadFile = async (bookingId: string) => {
@@ -406,62 +416,95 @@ export default function AdminBookingClient() {
             )}
           </div>
 
-          {slots.map((slot, index) => (
-            <div key={index} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '16px', marginBottom: '14px', background: '#f9fafb' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontSize: '12px', fontWeight: '700', color: '#8B0000' }}>Slot {index + 1}</span>
-                {slots.length > 1 && (
-                  <button type="button" onClick={() => removeSlot(index)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: '12px', fontWeight: '600' }}>
-                    Buang Slot
-                  </button>
+          {slots.map((slot, index) => {
+            const isExpanded = expandedSlotIndex === index
+
+            const equipmentSummary = equipmentOptions
+              .filter(opt => (slot.equipment[opt.id] ?? 0) > 0)
+              .map(opt => `${slot.equipment[opt.id]} ${opt.label}`)
+              .join(', ')
+
+            const summaryText = [
+              slot.booking_date || null,
+              (slot.start_time && slot.end_time) ? `${slot.start_time}-${slot.end_time}` : null,
+              equipmentSummary || null,
+            ].filter(Boolean).join(' · ') || 'Belum diisi'
+
+            return (
+              <div key={index} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: isExpanded ? '16px' : '12px 16px', marginBottom: '14px', background: '#f9fafb' }}>
+                <div
+                  onClick={() => setExpandedSlotIndex(isExpanded ? null : index)}
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isExpanded ? '12px' : 0, cursor: 'pointer', gap: '10px' }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8B0000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                      style={{ flexShrink: 0, transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.15s' }}>
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                    <span style={{ fontSize: '12px', fontWeight: '700', color: '#8B0000', flexShrink: 0 }}>Slot {index + 1}</span>
+                    {!isExpanded && (
+                      <span style={{ fontSize: '11px', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {summaryText}
+                      </span>
+                    )}
+                  </div>
+                  {slots.length > 1 && (
+                    <button type="button" onClick={(e) => { e.stopPropagation(); removeSlot(index) }} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: '12px', fontWeight: '600', flexShrink: 0 }}>
+                      Buang Slot
+                    </button>
+                  )}
+                </div>
+
+                {isExpanded && (
+                  <>
+                    <label style={labelStyle}>Booking Date <span style={{ color: '#dc2626' }}>*</span></label>
+                    <BlackoutCalendar
+                      value={slot.booking_date}
+                      onChange={(date) => updateSlot(index, 'booking_date', date)}
+                      placeholder="Pilih tarikh tempahan"
+                      isAdmin={true}
+                    />
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', margin: '14px 0' }}>
+                      <div>
+                        <label style={labelStyle}>Start Time <span style={{ color: '#dc2626' }}>*</span></label>
+                        <input type="time" value={slot.start_time} onChange={(e) => updateSlot(index, 'start_time', e.target.value)}
+                          style={inputStyle}
+                          onFocus={(e) => e.target.style.borderColor = '#8B0000'}
+                          onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>End Time <span style={{ color: '#dc2626' }}>*</span></label>
+                        <input type="time" value={slot.end_time} onChange={(e) => updateSlot(index, 'end_time', e.target.value)}
+                          style={inputStyle}
+                          onFocus={(e) => e.target.style.borderColor = '#8B0000'}
+                          onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
+                      </div>
+                    </div>
+
+                    <label style={{ ...labelStyle, marginBottom: '10px' }}>Additional Equipment</label>
+                    {equipmentOptions.length > 0 ? (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                        {equipmentOptions.map((opt) => (
+                          <EquipmentSelect
+                            key={opt.id}
+                            label={opt.label}
+                            max={opt.max_quantity}
+                            value={slot.equipment[opt.id] ?? 0}
+                            onChange={(val) => updateSlotEquipment(index, opt.id, val)}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <p style={{ fontSize: '12px', color: '#9ca3af' }}>
+                        {form.venue_id ? 'Tiada equipment tersedia untuk venue ini.' : 'Pilih venue dahulu untuk lihat equipment.'}
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
-
-              <label style={labelStyle}>Booking Date <span style={{ color: '#dc2626' }}>*</span></label>
-              <BlackoutCalendar
-                value={slot.booking_date}
-                onChange={(date) => updateSlot(index, 'booking_date', date)}
-                placeholder="Pilih tarikh tempahan"
-                isAdmin={true}
-              />
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', margin: '14px 0' }}>
-                <div>
-                  <label style={labelStyle}>Start Time <span style={{ color: '#dc2626' }}>*</span></label>
-                  <input type="time" value={slot.start_time} onChange={(e) => updateSlot(index, 'start_time', e.target.value)}
-                    style={inputStyle}
-                    onFocus={(e) => e.target.style.borderColor = '#8B0000'}
-                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
-                </div>
-                <div>
-                  <label style={labelStyle}>End Time <span style={{ color: '#dc2626' }}>*</span></label>
-                  <input type="time" value={slot.end_time} onChange={(e) => updateSlot(index, 'end_time', e.target.value)}
-                    style={inputStyle}
-                    onFocus={(e) => e.target.style.borderColor = '#8B0000'}
-                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
-                </div>
-              </div>
-
-              <label style={{ ...labelStyle, marginBottom: '10px' }}>Additional Equipment</label>
-              {equipmentOptions.length > 0 ? (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  {equipmentOptions.map((opt) => (
-                    <EquipmentSelect
-                      key={opt.id}
-                      label={opt.label}
-                      max={opt.max_quantity}
-                      value={slot.equipment[opt.id] ?? 0}
-                      onChange={(val) => updateSlotEquipment(index, opt.id, val)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <p style={{ fontSize: '12px', color: '#9ca3af' }}>
-                  {form.venue_id ? 'Tiada equipment tersedia untuk venue ini.' : 'Pilih venue dahulu untuk lihat equipment.'}
-                </p>
-              )}
-            </div>
-          ))}
+            )
+          })}
 
           <button
             type="button"

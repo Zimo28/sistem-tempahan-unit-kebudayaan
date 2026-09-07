@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 type Booking = {
   id: string
   full_name: string
+  phone_number: string
   organization: string
   event_name: string
   booking_date: string
@@ -25,10 +26,9 @@ export default function StatusPage() {
     if (!searchQuery.trim()) return
     setLoading(true)
     setSearched(true)
-    const { data } = await supabase
-      .from('bookings')
-      .select('id, full_name, organization, event_name, booking_date, start_time, end_time, status')
-      .ilike('full_name', `%${searchQuery}%`)
+    // RPC ni banding nombor telefon lepas buang semua sengkang/space dari kedua-dua
+    // belah -- jadi "012-3456789" dan "0123456789" dianggap sama.
+    const { data } = await supabase.rpc('search_bookings_by_phone', { search_query: searchQuery })
     setSearchResults(data || [])
     setLoading(false)
   }
@@ -89,7 +89,26 @@ export default function StatusPage() {
             Unit Kebudayaan — UiTM Cawangan Kelantan
           </div>
           <h1 style={{ fontSize: '26px', fontWeight: '800', color: 'white', letterSpacing: '-0.5px', marginBottom: '6px' }}>Semak Status Tempahan</h1>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Masukkan nama penuh untuk semak status tempahan anda</p>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Masukkan nombor telefon untuk semak status tempahan anda</p>
+        </div>
+      </div>
+
+      {/* Progress Steps */}
+      <div style={{ background: 'white', borderBottom: '1px solid #f3f4f6', padding: '12px 16px', overflowX: 'auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', minWidth: 'max-content', margin: '0 auto' }}>
+          {[
+            { num: '1', label: 'Masukkan Nombor Telefon' },
+            { num: '2', label: 'Cari' },
+            { num: '3', label: 'Lihat Status' },
+          ].map((step, i) => (
+            <div key={step.num} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'linear-gradient(135deg, #8B0000, #a50000)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '700', flexShrink: 0 }}>{step.num}</div>
+                <span style={{ fontSize: '12px', fontWeight: '500', color: '#374151', whiteSpace: 'nowrap' }}>{step.label}</span>
+              </div>
+              {i < 2 && <div style={{ width: '24px', height: '1px', background: '#e5e7eb', flexShrink: 0 }} />}
+            </div>
+          ))}
         </div>
       </div>
 
@@ -97,8 +116,8 @@ export default function StatusPage() {
       <div style={{ width: '100%', maxWidth: '560px' }}>
         <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
           <input
-            type="text"
-            placeholder="Masukkan nama penuh..."
+            type="tel"
+            placeholder="cth: 012-3456789"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -136,7 +155,7 @@ export default function StatusPage() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                       <div>
                         <p style={{ fontSize: '14px', fontWeight: '700', color: '#111827', margin: 0 }}>{b.full_name}</p>
-                        <p style={{ fontSize: '12px', color: '#9ca3af', margin: '2px 0 0' }}>{b.organization}</p>
+                        <p style={{ fontSize: '12px', color: '#9ca3af', margin: '2px 0 0' }}>{b.organization} · {b.phone_number}</p>
                       </div>
                       <span style={{ fontSize: '11px', fontWeight: '600', background: 'white', color: cfg.color, padding: '3px 12px', borderRadius: '999px', border: `1px solid ${cfg.border}` }}>{cfg.label}</span>
                     </div>
