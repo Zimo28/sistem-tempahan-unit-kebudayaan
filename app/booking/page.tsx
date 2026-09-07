@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { showToast } from '@/components/Toast'
 import { supabase } from '@/lib/supabase'
@@ -108,7 +108,7 @@ function EquipmentSelect({ label, max, value, onChange }: {
   )
 }
 
-export default function BookingPage() {
+function BookingContent() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [file, setFile] = useState<File | null>(null)
@@ -809,5 +809,17 @@ export default function BookingPage() {
         input::placeholder { color: #9ca3af; }
       `}</style>
     </div>
+  )
+}
+
+export default function BookingPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #f5f5f5 0%, #fef2f2 100%)' }}>
+        <p style={{ color: '#6b7280', fontSize: '14px' }}>Memuatkan...</p>
+      </div>
+    }>
+      <BookingContent />
+    </Suspense>
   )
 }
