@@ -192,9 +192,9 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
     if (!error) {
       setBookings(prev => prev.map(b => b.id === id ? { ...b, note: noteValues[id] } : b))
       setEditingNote(null)
-      showToast('Note berjaya disimpan!', 'success')
+      showToast('Note successfully saved!', 'success')
     } else {
-      showToast('Ralat semasa menyimpan note.', 'error')
+      showToast('Error occurred while saving note.', 'error')
     }
     setSavingNote(false)
   }
@@ -221,7 +221,7 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
       for (const booking of groupSlots) {
         const hasConflict = await checkConflictForApprove(booking)
         if (hasConflict) {
-          showToast(`Conflict pada ${booking.booking_date}! Ada tempahan lain yang approved pada masa yang sama.`, 'error')
+          showToast(`Conflict on ${booking.booking_date}! There is another booking approved at the same time.`, 'error')
           setLoading(false)
           return
         }
@@ -242,17 +242,17 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
         body: JSON.stringify({ type: 'status_changed', booking: { ...groupSlots[0], status, slots: groupSlots } }),
       })
       showToast(
-        status === 'approved' ? 'Tempahan telah diluluskan!' : 'Tempahan telah ditolak.',
+        status === 'approved' ? 'Booking has been approved!' : 'Booking has been rejected.',
         status === 'approved' ? 'success' : 'error'
       )
     } else {
-      showToast('Ralat! Cuba lagi.', 'error')
+      showToast('Error! Please try again.', 'error')
     }
     setLoading(false)
   }
 
   const deleteGroup = async (groupSlots: Booking[]) => {
-    if (!confirm(`Confirm nak delete tempahan ni${groupSlots.length > 1 ? ` (${groupSlots.length} slot)` : ''}?`)) return
+    if (!confirm(`Confirm to delete booking${groupSlots.length > 1 ? ` (${groupSlots.length} slot)` : ''}?`)) return
     setLoading(true)
     const ids = groupSlots.map(s => s.id)
     const { error } = await supabase.from('bookings').delete().in('id', ids)
@@ -260,16 +260,16 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
       for (const id of ids) await deleteFromGoogleSheet(id)
       setExpanded(null)
       setBookings(prev => prev.filter(b => !ids.includes(b.id)))
-      showToast('Tempahan berjaya dipadam.', 'success')
+      showToast('Booking has been deleted successfully.', 'success')
     } else {
-      showToast('Ralat semasa memadam.', 'error')
+      showToast('Error occurred while deleting booking.', 'error')
     }
     setLoading(false)
   }
 
   const savePostpone = async (id: string) => {
     if (!postponeForm.date || !postponeForm.start_time || !postponeForm.end_time) {
-      showToast('Sila isi tarikh dan masa baru.', 'error')
+      showToast('Please fill in the new date and time.', 'error')
       return
     }
     setSavingPostpone(true)
@@ -294,9 +294,9 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
       } : b))
       setPostponingId(null)
       setPostponeForm({ date: '', start_time: '', end_time: '', reason: '' })
-      showToast('Slot berjaya ditangguhkan!', 'success')
+      showToast('Slot has been postponed successfully!', 'success')
     } else {
-      showToast('Ralat semasa mengemaskini.', 'error')
+      showToast('Error occurred while updating the slot.', 'error')
     }
     setSavingPostpone(false)
   }
@@ -306,10 +306,10 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
 
   const printSlip = (booking: Booking, group: BookingGroup) => {
     const eq = [
-      booking.microphone > 0 ? `Mikrofon (${booking.microphone})` : null,
-      booking.aircond > 0 ? `Penghawa Dingin (${booking.aircond})` : null,
-      booking.pa_system > 0 ? `Sistem PA (${booking.pa_system})` : null,
-      booking.lcd_projector > 0 ? `Projektor LCD (${booking.lcd_projector})` : null,
+      booking.microphone > 0 ? `Microphone (${booking.microphone})` : null,
+      booking.aircond > 0 ? `Air Conditioning (${booking.aircond})` : null,
+      booking.pa_system > 0 ? `PA System (${booking.pa_system})` : null,
+      booking.lcd_projector > 0 ? `LCD Projector (${booking.lcd_projector})` : null,
     ].filter(Boolean)
 
     const formatDate = (dateStr: string) =>
@@ -319,102 +319,132 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
       <html lang="ms">
       <head>
         <meta charset="UTF-8"/>
-        <title>Slip Kelulusan - ${booking.full_name}</title>
+        <title>Surat Kelulusan - ${booking.full_name}</title>
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { font-family: 'Segoe UI', Arial, sans-serif; background: white; color: #1a1a1a; padding: 48px; }
+          body { font-family: 'Times New Roman', Georgia, serif; background: white; color: #111827; padding: 56px 64px; line-height: 1.6; }
           .watermark {
             position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%) rotate(-30deg);
             font-size: 90px; font-weight: 900;
-            color: rgba(22,163,74,0.07); letter-spacing: 8px;
+            color: rgba(22,163,74,0.06); letter-spacing: 8px;
             pointer-events: none; z-index: 0; white-space: nowrap;
           }
           .content { position: relative; z-index: 1; }
-          .header { text-align: center; border-bottom: 3px solid #8B0000; padding-bottom: 20px; margin-bottom: 24px; }
-          .header h1 { font-size: 20px; font-weight: 800; color: #8B0000; letter-spacing: 1px; }
-          .header p { font-size: 12px; color: #6b7280; margin-top: 4px; }
-          .slip-title { text-align: center; margin-bottom: 16px; }
-          .slip-title h2 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #374151; }
-          .slip-title .ref { font-size: 11px; color: #9ca3af; margin-top: 4px; }
-          .badge {
-            display: block; width: fit-content; margin: 0 auto 24px;
-            background: #dcfce7; color: #166534; border: 1.5px solid #86efac;
-            padding: 5px 20px; border-radius: 999px; font-size: 13px; font-weight: 700;
-          }
-          .section { margin-bottom: 20px; }
-          .section-title { font-size: 10px; font-weight: 700; color: #8B0000; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; margin-bottom: 12px; }
-          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-          .field label { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 2px; }
-          .field p { font-size: 13px; font-weight: 600; color: #1a1a1a; }
-          .eq-list { display: flex; gap: 8px; flex-wrap: wrap; }
+
+          .letterhead { display: flex; align-items: center; gap: 16px; border-bottom: 3px double #8B0000; padding-bottom: 14px; margin-bottom: 6px; }
+          .letterhead img { height: 56px; width: auto; object-fit: contain; }
+          .letterhead .org h1 { font-size: 16px; font-weight: 800; color: #8B0000; letter-spacing: 0.5px; }
+          .letterhead .org p { font-size: 11px; color: #4b5563; margin-top: 2px; }
+          .ref-block { text-align: right; font-size: 11.5px; color: #374151; margin: 18px 0 28px; }
+          .ref-block p { margin: 1px 0; }
+
+          .addressee { font-size: 12.5px; margin-bottom: 18px; }
+          .addressee p { margin: 1px 0; }
+          .salutation { font-size: 12.5px; margin-bottom: 14px; font-weight: 600; }
+
+          .subject { font-size: 12.5px; font-weight: 700; text-decoration: underline; margin-bottom: 18px; text-transform: uppercase; }
+
+          .para { font-size: 12.5px; margin-bottom: 14px; text-align: justify; }
+          .para .num { font-weight: 700; margin-right: 4px; }
+
+          .details-block { margin: 8px 0 18px 22px; }
+          .details-block .row { display: grid; grid-template-columns: 190px 12px 1fr; font-size: 12.5px; margin-bottom: 7px; }
+          .details-block .row span.label { color: #374151; }
+          .details-block .row span.value { font-weight: 600; color: #111827; }
+
+          .eq-list { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 18px 22px; }
           .eq-tag { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; }
-          .footer { margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
-          .footer .note { font-size: 10px; color: #9ca3af; line-height: 1.7; max-width: 55%; }
-          .sign .line { width: 160px; border-top: 1px solid #374151; margin-bottom: 6px; }
-          .sign p { font-size: 10px; color: #6b7280; text-align: center; }
-          .sign .name { color: #8B0000; font-weight: 700; margin-top: 2px; }
-          .generated { text-align: center; margin-top: 16px; font-size: 10px; color: #d1d5db; }
+
+          .status-badge {
+            display: inline-block; background: #dcfce7; color: #166534; border: 1.5px solid #86efac;
+            padding: 4px 16px; border-radius: 4px; font-size: 12px; font-weight: 700; margin: 4px 0 18px;
+          }
+
+          .closing { font-size: 12.5px; margin: 24px 0 8px; }
+          .motto { font-size: 12.5px; font-weight: 700; color: #8B0000; margin-bottom: 32px; }
+
+          .sign-block { margin-top: 8px; }
+          .sign-block p { font-size: 12.5px; margin: 1px 0; }
+          .sign-block .line { width: 200px; border-top: 1px solid #374151; margin: 46px 0 6px; }
+          .sign-block .name { font-weight: 700; color: #8B0000; }
+
+          .footer-note { margin-top: 44px; border-top: 1px solid #e5e7eb; padding-top: 14px; font-size: 9.5px; color: #9ca3af; line-height: 1.7; }
+          .generated { text-align: center; margin-top: 14px; font-size: 9.5px; color: #d1d5db; }
+
           @media print {
             .print-bar { display: none !important; }
-            body { padding: 40px; }
-            .watermark, .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            body { padding: 40px 56px; }
+            .watermark, .status-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           }
         </style>
       </head>
       <body>
         <div class="watermark">DILULUSKAN</div>
         <div class="content">
-          <div class="header">
+
+          <div class="letterhead">
             <img src="https://mini-theater-booking-system.vercel.app/logo.png"
               alt="Logo"
-              style="height: 56px; width: auto; object-fit: contain; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;"
               onerror="this.style.display='none'"
             />
-            <h1>MINI THEATER</h1>
-            <p>UiTM Cawangan Kelantan, Kampus Machang</p>
-          </div>
-          <div class="slip-title">
-            <h2>Slip Pengesahan Tempahan</h2>
-            <p class="ref">No. Rujukan: MT-${booking.id.slice(0, 8).toUpperCase()}${group.slots.length > 1 ? ` (Slot ${group.slots.findIndex(s => s.id === booking.id) + 1} / ${group.slots.length})` : ''}</p>
-          </div>
-          <span class="badge">✓ DILULUSKAN</span>
-          <div class="section">
-            <p class="section-title">Maklumat Pemohon</p>
-            <div class="grid">
-              <div class="field"><label>Nama Penuh</label><p>${booking.full_name}</p></div>
-              <div class="field"><label>No. Telefon</label><p>${booking.phone_number}</p></div>
-              <div class="field"><label>Organisasi / Kelab</label><p>${booking.organization}</p></div>
-              <div class="field"><label>Nama Program / Event</label><p>${booking.event_name}</p></div>
+            <div class="org">
+              <h1>UNIT KEBUDAYAAN</h1>
+              <p>UiTM Cawangan Kelantan, Kampus Machang, 18500 Machang, Kelantan</p>
             </div>
           </div>
-          <div class="section">
-            <p class="section-title">Maklumat Tempahan</p>
-            <div class="grid">
-              <div class="field"><label>Tarikh Program</label><p>${formatDate(booking.booking_date)}</p></div>
-              <div class="field"><label>Masa</label><p>${booking.start_time} - ${booking.end_time}</p></div>
-              <div class="field"><label>Tempat</label><p>${group.venue_name}, UiTM Cawangan Kelantan</p></div>
-              <div class="field"><label>Tarikh Permohonan</label><p>${formatDate(booking.created_at.split('T')[0])}</p></div>
-            </div>
+
+          <div class="ref-block">
+            <p>Rujukan Kami: MT-${booking.id.slice(0, 8).toUpperCase()}${group.slots.length > 1 ? ` (Slot ${group.slots.findIndex(s => s.id === booking.id) + 1}/${group.slots.length})` : ''}</p>
+            <p>Tarikh: ${new Date().toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
           </div>
-          <div class="section">
-            <p class="section-title">Peralatan Dipohon</p>
-            ${eq.length > 0
-              ? `<div class="eq-list">${eq.map(e => `<span class="eq-tag">${e}</span>`).join('')}</div>`
-              : '<p style="font-size:12px;color:#9ca3af;font-style:italic;">Tiada peralatan tambahan</p>'
-            }
+
+          <div class="addressee">
+            <p><strong>${booking.full_name}</strong></p>
+            <p>${booking.organization}</p>
           </div>
-          <div class="footer">
-            <div class="note">
-              * Slip ini adalah pengesahan rasmi tempahan Unit Kebudayaan.<br/>
-              * Sila bawa slip ini semasa program berlangsung.<br/>
-              * Sebarang pertanyaan, hubungi pihak pengurusan.
-            </div>
-            <div class="sign">
-              <div class="line"></div>
-              <p>Tandatangan & Cop Rasmi</p>
-              <p class="name">Pengurusan Unit Kebudayaan</p>
-            </div>
+
+          <p class="salutation">Tuan/Puan,</p>
+
+          <p class="subject">PERKARA: KELULUSAN TEMPAHAN MINI THEATER BAGI PROGRAM "${booking.event_name}"</p>
+
+          <p class="para"><span class="num">1.</span>Dengan hormatnya perkara di atas adalah dirujuk.</p>
+          <p class="para"><span class="num">2.</span>Sukacita dimaklumkan bahawa permohonan tempahan Mini Theater, Unit Kebudayaan bagi program tuan/puan yang tersebut di atas telah <strong>DILULUSKAN</strong> oleh pihak pengurusan, dengan butiran seperti berikut:</p>
+
+          <div class="details-block">
+            <div class="row"><span class="label">Nama Pemohon</span><span>:</span><span class="value">${booking.full_name}</span></div>
+            <div class="row"><span class="label">No. Telefon</span><span>:</span><span class="value">${booking.phone_number}</span></div>
+            <div class="row"><span class="label">Organisasi / Kelab</span><span>:</span><span class="value">${booking.organization}</span></div>
+            <div class="row"><span class="label">Tarikh Program</span><span>:</span><span class="value">${formatDate(booking.booking_date)}</span></div>
+            <div class="row"><span class="label">Masa</span><span>:</span><span class="value">${booking.start_time} - ${booking.end_time}</span></div>
+            <div class="row"><span class="label">Tempat</span><span>:</span><span class="value">${group.venue_name}, UiTM Cawangan Kelantan</span></div>
+            <div class="row"><span class="label">Tarikh Permohonan</span><span>:</span><span class="value">${formatDate(booking.created_at.split('T')[0])}</span></div>
+          </div>
+
+          <p class="para"><span class="num">3.</span>Peralatan tambahan yang dipohon adalah seperti berikut:</p>
+          ${eq.length > 0
+            ? `<div class="eq-list">${eq.map(e => `<span class="eq-tag">${e}</span>`).join('')}</div>`
+            : '<p style="font-size:12.5px;color:#9ca3af;font-style:italic;margin:8px 0 18px 22px;">Tiada peralatan tambahan dipohon.</p>'
+          }
+
+          <p class="para"><span class="num">4.</span>Status permohonan:</p>
+          <div style="margin-left: 22px;"><span class="status-badge">✓ DILULUSKAN</span></div>
+
+          <p class="para"><span class="num">5.</span>Tuan/puan diminta membawa surat ini semasa program berlangsung sebagai bukti pengesahan tempahan. Sebarang pertanyaan lanjut bolehlah dikemukakan kepada pihak pengurusan Unit Kebudayaan.</p>
+
+          <p class="closing">Sekian, harap maklum dan terima kasih.</p>
+          <p class="motto">"BERKHIDMAT UNTUK NEGARA"</p>
+
+          <div class="sign-block">
+            <p>Yang menjalankan tugas,</p>
+            <div class="line"></div>
+            <p class="name">Pengurusan Unit Kebudayaan</p>
+            <p>UiTM Cawangan Kelantan</p>
+          </div>
+
+          <div class="footer-note">
+            * Surat ini dijana secara automatik oleh sistem dan sah tanpa tandatangan basah.<br/>
+            * Sila simpan surat ini untuk rujukan semasa program berlangsung.
           </div>
           <p class="generated">Dijana pada: ${new Date().toLocaleString('ms-MY')}</p>
 
@@ -425,6 +455,7 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
               color: white; border: none; border-radius: 8px;
               font-size: 13px; font-weight: 600; cursor: pointer;
               box-shadow: 0 4px 12px rgba(139,0,0,0.3); letter-spacing: 0.3px;
+              font-family: 'Segoe UI', Arial, sans-serif;
             ">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 6 2 18 2 18 9"/>
@@ -527,7 +558,7 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
         {/* Slot-by-slot breakdown */}
         <div style={{ marginBottom: '16px' }}>
           <p style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            {isMulti ? 'Jadual Tempahan' : 'Peralatan & Tindakan'}
+            {isMulti ? 'Booking Schedule' : 'Equipment & Actions'}
           </p>
           {group.slots.map((slot, i) => {
             const eq = equipment(slot)
@@ -804,7 +835,22 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
           </button>
           <a
             href="/admin/bookings/add"
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '7px 14px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #8B0000, #a50000)', color: 'white', fontSize: '13px', fontWeight: '600', cursor: 'pointer', textDecoration: 'none', transition: 'all 0.15s', boxShadow: '0 2px 8px rgba(139,0,0,0.2)' }}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px', 
+              padding: '7px 14px', 
+              borderRadius: '8px', 
+              border: 'none', 
+              background: 'linear-gradient(135deg, #8B0000, #a50000)', 
+              color: 'white', 
+              fontSize: '13px', 
+              fontWeight: '600', 
+              cursor: 'pointer', 
+              textDecoration: 'none', 
+              transition: 'all 0.15s', 
+              boxShadow: '0 2px 8px rgba(139,0,0,0.2)' 
+            }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -851,7 +897,7 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
               cursor: 'pointer', fontWeight: '500', appearance: 'none', WebkitAppearance: 'none',
             }}
           >
-            <option value="all">Semua Venue</option>
+            <option value="all">All Venues</option>
             {venues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
           </select>
         </div>

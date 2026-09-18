@@ -193,26 +193,26 @@ export default function AdminBookingClient() {
 
   const handleSubmit = async () => {
     if (!form.venue_id) {
-      showToast('Sila pilih tempat/venue.', 'error')
+      showToast('Please select a venue.', 'error')
       return
     }
     if (!form.full_name || !form.phone_number || !form.organization || !form.event_name) {
-      showToast('Sila isi semua maklumat peribadi.', 'error')
+      showToast('Please fill in all personal information.', 'error')
       return
     }
 
     const phoneRegex = /^(\+?60|0)[0-9]{8,10}$/
     if (!phoneRegex.test(form.phone_number.replace(/[-\s]/g, ''))) {
-      showToast('Format nombor telefon tidak sah. Contoh: 012-3456789', 'error')
+      showToast('Invalid phone number format. Example: 012-3456789', 'error')
       return
     }
 
     for (const slot of slots) {
       if (!slot.booking_date || !slot.start_time || !slot.end_time) {
-        showToast('Sila isi tarikh dan masa untuk semua slot.', 'error'); return
+        showToast('Please fill in the date and time for all slots.', 'error'); return
       }
       if (slot.start_time >= slot.end_time) {
-        showToast('Masa tamat mesti lebih lewat dari masa mula untuk setiap slot.', 'error'); return
+        showToast('End time must be later than start time for each slot.', 'error'); return
       }
     }
 
@@ -223,7 +223,7 @@ export default function AdminBookingClient() {
       const hasConflict = await checkConflictForSlot(slot)
       if (hasConflict) {
         const proceed = window.confirm(
-          `⚠️ Slot ${i + 1} (${slot.booking_date}, ${slot.start_time}-${slot.end_time}) ada conflict masa dengan tempahan lain.\nTeruskan sebagai admin?`
+          `⚠️ Slot ${i + 1} (${slot.booking_date}, ${slot.start_time}-${slot.end_time}) has a time conflict with another booking.\nContinue as admin?`
         )
         if (!proceed) return
       }
@@ -236,7 +236,7 @@ export default function AdminBookingClient() {
 
       if (blackout) {
         const proceedBlackout = window.confirm(
-          `⚠️ Slot ${i + 1}: Tarikh ${slot.booking_date} adalah blackout date${blackout.reason ? ` (${blackout.reason})` : ''}.\nTeruskan sebagai admin?`
+          `⚠️ Slot ${i + 1}: Date ${slot.booking_date} is a blackout date${blackout.reason ? ` (${blackout.reason})` : ''}.\nContinue as admin?`
         )
         if (!proceedBlackout) return
       }
@@ -265,7 +265,7 @@ export default function AdminBookingClient() {
       .from('bookings').insert(rowsToInsert).select()
 
     if (error) {
-      showToast('Ralat semasa menambah tempahan.', 'error')
+      showToast('Error occurred while adding the booking.', 'error')
       setLoading(false)
       return
     }
@@ -304,7 +304,7 @@ export default function AdminBookingClient() {
       }),
     })
 
-    showToast(`Tempahan berjaya ditambah (${slots.length} slot) dan diluluskan!`, 'success')
+    showToast(`Booking added successfully (${slots.length} slot) and approved!`, 'success')
     setTimeout(() => { window.location.href = '/admin/bookings' }, 1200)
     setLoading(false)
   }
@@ -346,7 +346,7 @@ export default function AdminBookingClient() {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6"/>
             </svg>
-            Kembali
+            Back
           </a>
         </div>
         <h1 style={{ fontSize: '26px', fontWeight: '700', color: '#111827', letterSpacing: '-0.5px' }}>
@@ -366,7 +366,7 @@ export default function AdminBookingClient() {
             <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#111827' }}>Personal & Organization Details</h2>
           </div>
           <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>Tempat / Venue <span style={{ color: '#dc2626' }}>*</span></label>
+            <label style={labelStyle}>Venue <span style={{ color: '#dc2626' }}>*</span></label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {venues.map(v => (
                 <button
@@ -428,7 +428,7 @@ export default function AdminBookingClient() {
               slot.booking_date || null,
               (slot.start_time && slot.end_time) ? `${slot.start_time}-${slot.end_time}` : null,
               equipmentSummary || null,
-            ].filter(Boolean).join(' · ') || 'Belum diisi'
+            ].filter(Boolean).join(' · ') || 'Not filled'
 
             return (
               <div key={index} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: isExpanded ? '16px' : '12px 16px', marginBottom: '14px', background: '#f9fafb' }}>
@@ -450,7 +450,7 @@ export default function AdminBookingClient() {
                   </div>
                   {slots.length > 1 && (
                     <button type="button" onClick={(e) => { e.stopPropagation(); removeSlot(index) }} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: '12px', fontWeight: '600', flexShrink: 0 }}>
-                      Buang Slot
+                      Remove Slot
                     </button>
                   )}
                 </div>
@@ -461,7 +461,7 @@ export default function AdminBookingClient() {
                     <BlackoutCalendar
                       value={slot.booking_date}
                       onChange={(date) => updateSlot(index, 'booking_date', date)}
-                      placeholder="Pilih tarikh tempahan"
+                      placeholder="Select booking date"
                       isAdmin={true}
                     />
 
@@ -497,7 +497,7 @@ export default function AdminBookingClient() {
                       </div>
                     ) : (
                       <p style={{ fontSize: '12px', color: '#9ca3af' }}>
-                        {form.venue_id ? 'Tiada equipment tersedia untuk venue ini.' : 'Pilih venue dahulu untuk lihat equipment.'}
+                        {form.venue_id ? 'No equipment available for this venue.' : 'Please select a venue first to view available equipment.'}
                       </p>
                     )}
                   </>
@@ -516,14 +516,14 @@ export default function AdminBookingClient() {
               marginBottom: '14px',
             }}
           >
-            + Tambah Hari / Slot Lain
+            + Add Day / Slot
           </button>
 
           <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', padding: '10px 14px', fontSize: '12px', color: '#2563eb', display: 'flex', gap: '6px' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '1px' }}>
               <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
             </svg>
-            <span><strong>Admin Note:</strong> Semua slot akan dicipta sebagai "Approved" (bypass lead times & restrictions). Conflict/blackout akan diminta confirm satu-satu.</span>
+            <span><strong>Admin Note:</strong> All slots will be created as "Approved" (bypass lead times & restrictions). Conflicts/blackouts will be requested for confirmation one by one.</span>
           </div>
         </div>
 
@@ -554,7 +554,7 @@ export default function AdminBookingClient() {
               <button
                 onClick={() => setFile(null)}
                 style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
-              >Buang</button>
+              >Remove</button>
             </div>
           ) : (
             <div
@@ -564,7 +564,7 @@ export default function AdminBookingClient() {
                 e.preventDefault(); setDragOver(false)
                 const dropped = e.dataTransfer.files?.[0]
                 if (dropped?.type === 'application/pdf') setFile(dropped)
-                else showToast('Hanya fail PDF dibenarkan.', 'error')
+                else showToast('Only PDF files are allowed.', 'error')
               }}
               style={{
                 border: `2px dashed ${dragOver ? '#8B0000' : '#e5e7eb'}`,
@@ -594,7 +594,7 @@ export default function AdminBookingClient() {
                 <input type="file" accept=".pdf" style={{ display: 'none' }} onChange={(e) => {
                   const selected = e.target.files?.[0]
                   if (selected?.type === 'application/pdf') setFile(selected)
-                  else showToast('Hanya fail PDF dibenarkan.', 'error')
+                  else showToast('Only PDF files are allowed.', 'error')
                 }} />
               </label>
             </div>
@@ -620,10 +620,22 @@ export default function AdminBookingClient() {
         onMouseEnter={(e) => { if (!loading) e.currentTarget.style.boxShadow = '0 6px 28px rgba(139,0,0,0.35)' }}
         onMouseLeave={(e) => { if (!loading) e.currentTarget.style.boxShadow = '0 4px 20px rgba(139,0,0,0.25)' }}
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-        </svg>
-        {loading ? 'Menambah...' : `Add & Approve Booking${slots.length > 1 ? ` (${slots.length} slot)` : ''}`}
+        {loading ? (
+          <>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}>
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+            Submitting...
+          </>
+        ) : (
+          <>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+            {`Submit & Approve Booking${slots.length > 1 ? ` (${slots.length} slot)` : ''}`}
+          </>
+        )}
       </button>
 
       <style>{`
@@ -634,6 +646,10 @@ export default function AdminBookingClient() {
           cursor: pointer; opacity: 0.5;
         }
         input::placeholder { color: #9ca3af; }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
       `}</style>
     </div>
   )

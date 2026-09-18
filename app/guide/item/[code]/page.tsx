@@ -29,7 +29,29 @@ export default async function EquipmentQrPage({ params }: { params: Promise<{ co
     : []
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '24px 20px', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+
+      {/* Navbar */}
+      <nav style={{
+        background: 'white', borderBottom: '1px solid #f3f4f6',
+        padding: '0 24px', height: '64px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        position: 'sticky', top: 0, zIndex: 50,
+        boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+      }}>
+        <Link href="/"><img src="/logo.png" alt="Unit Kebudayaan" style={{ height: '44px', width: 'auto', objectFit: 'contain' }} /></Link>
+        <Link href="/" style={{
+          fontSize: '13px', color: '#8B0000', textDecoration: 'none',
+          fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px',
+          padding: '7px 14px', borderRadius: '8px', border: '1px solid #fecaca',
+          background: '#fef2f2', transition: 'all 0.15s',
+        }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Kembali
+        </Link>
+      </nav>
+
+      <div style={{ padding: '24px 20px', display: 'flex', justifyContent: 'center' }}>
       <div style={{ width: '100%', maxWidth: '420px' }}>
         <Link href={`/guide/category/${item.category}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#6b7280', textDecoration: 'none', marginBottom: '16px' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -112,6 +134,7 @@ export default async function EquipmentQrPage({ params }: { params: Promise<{ co
             No guide content has been added for this item yet.
           </div>
         )}
+      </div>
       </div>
     </div>
   )

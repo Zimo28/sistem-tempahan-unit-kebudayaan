@@ -49,6 +49,16 @@ const getReferenceId = (booking: any): string | undefined => {
   return booking.groupId || booking.id
 }
 
+// Nama venue mungkin dah sedia (join dari BookingClient, cth. status_changed) atau
+// cuma ada venue_id (dari borang booking, cth. new_booking/admin_booking) -- kalau
+// tak ada nama terus, lookup dari table venues guna id tu.
+const getVenueName = async (booking: any): Promise<string> => {
+  if (booking.venues?.name) return booking.venues.name
+  if (!booking.venue_id) return '-'
+  const { data } = await supabase.from('venues').select('name').eq('id', booking.venue_id).single()
+  return data?.name ?? '-'
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json()
   const { type, booking } = body
@@ -59,13 +69,16 @@ export async function POST(req: NextRequest) {
   if (type === 'new_booking') {
     const slots = normalizeSlots(booking)
     const slotCount = slots.length
+    const venueName = await getVenueName(booking)
 
     telegramMessage = `
 🔔 <b>Tempahan Baru!${slotCount > 1 ? ` (${slotCount} slot)` : ''}</b>
 
 👤 <b>Nama:</b> ${booking.full_name}
+📞 <b>Telefon:</b> ${booking.phone_number}
 🏢 <b>Organisasi:</b> ${booking.organization}
-🎭 <b>Event:</b> ${booking.event_name}
+🎭 <b>Event:</b> ${booking.event_name}  
+📍 <b>Tempat:</b> ${venueName}
 ${formatSlotsText(slots)}
 📌 <b>Status:</b> Pending
     `.trim()
@@ -73,7 +86,7 @@ ${formatSlotsText(slots)}
     notification = {
       type: 'new_booking',
       title: `Tempahan baru — ${booking.event_name}${slotCount > 1 ? ` (${slotCount} slot)` : ''}`,
-      message: `${booking.full_name} · ${booking.organization} · ${slots[0].booking_date}${slotCount > 1 ? ` +${slotCount - 1} lagi` : ''}`,
+      message: `${booking.full_name} · ${venueName} · ${slots[0].booking_date}${slotCount > 1 ? ` +${slotCount - 1} lagi` : ''}`,
       booking_id: getReferenceId(booking),
     }
   }

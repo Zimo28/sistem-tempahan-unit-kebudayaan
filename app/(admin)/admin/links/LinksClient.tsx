@@ -192,7 +192,7 @@ export default function LinksClient({ links: initialLinks, settings: initialSett
       <div>
         <div style={{ marginBottom: '20px' }}>
           <h1 style={{ fontSize: '26px', fontWeight: '700', color: '#111827', letterSpacing: '-0.5px' }}>Homepage Links</h1>
-          <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '4px' }}>Drag untuk susun semula, toggle untuk sorok/papar, klik pensel untuk edit.</p>
+          <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '4px' }}>Drag to reorder, toggle to show/hide, click pencil to edit.</p>
         </div>
 
         {/* Bio & Branding */}
@@ -221,7 +221,7 @@ export default function LinksClient({ links: initialLinks, settings: initialSett
                   onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadIcon(f, 'hero') }} />
               </label>
             </div>
-            <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px' }}>Kosongkan untuk guna logo default (/logo.png).</p>
+            <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px' }}>Leave empty to use default logo (/logo.png).</p>
           </div>
           <button onClick={saveHero} disabled={savingHero} style={{ background: '#8B0000', color: 'white', border: 'none', borderRadius: '8px', padding: '9px 18px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', opacity: savingHero ? 0.6 : 1 }}>
             {savingHero ? 'Saving...' : 'Save Bio'}
@@ -261,11 +261,11 @@ export default function LinksClient({ links: initialLinks, settings: initialSett
                 </select>
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
-                <label style={labelStyle}>Description (subtitle bawah title, opsyenal)</label>
+                <label style={labelStyle}>Description (subtitle bawah title, optional)</label>
                 <input type="text" value={newLink.description} onChange={(e) => setNewLink(p => ({ ...p, description: e.target.value }))} style={inputStyle} placeholder="cth: Manual & panduan penggunaan" />
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
-                <label style={labelStyle}>Custom Icon (opsyenal, overrides preset)</label>
+                <label style={labelStyle}>Custom Icon (optional, overrides preset)</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   {newLink.custom_icon_url && (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -316,7 +316,7 @@ export default function LinksClient({ links: initialLinks, settings: initialSett
                   <div style={{ display: 'flex', gap: '8px', flex: 1, flexWrap: 'wrap', alignItems: 'center' }}>
                     <input value={editValue.title} onChange={(e) => setEditValue(p => ({ ...p, title: e.target.value }))} style={{ ...inputStyle, flex: 1, minWidth: '120px' }} placeholder="Title" />
                     <input value={editValue.url} onChange={(e) => setEditValue(p => ({ ...p, url: e.target.value }))} style={{ ...inputStyle, flex: 1, minWidth: '140px' }} placeholder="URL" />
-                    <input value={editValue.description} onChange={(e) => setEditValue(p => ({ ...p, description: e.target.value }))} style={{ ...inputStyle, flex: 1, minWidth: '160px' }} placeholder="Description (opsyenal)" />
+                    <input value={editValue.description} onChange={(e) => setEditValue(p => ({ ...p, description: e.target.value }))} style={{ ...inputStyle, flex: 1, minWidth: '160px' }} placeholder="Description (optional)" />
                     <select value={editValue.icon_key} onChange={(e) => setEditValue(p => ({ ...p, icon_key: e.target.value }))} style={{ ...inputStyle, width: '130px', cursor: 'pointer' }}>
                       {iconOptions.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
                     </select>

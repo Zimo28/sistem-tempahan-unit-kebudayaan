@@ -157,7 +157,7 @@ export default async function HomePage() {
       {/* ── FOOTER ── */}
       <footer style={{ padding: '28px 20px', textAlign: 'center', borderTop: '1px solid #f3f4f6' }}>
         <p style={{ fontSize: '11px', color: '#9ca3af' }}>
-          © {new Date().getFullYear()} Sistem Tempahan Unit Kebudayaan
+          © {new Date().getFullYear()} Sistem Tempahan Unit Kebudayaan. All rights reserved.
         </p>
       </footer>
     </div>

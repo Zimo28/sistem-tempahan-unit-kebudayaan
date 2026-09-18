@@ -40,12 +40,12 @@ export default function BorrowPage() {
 
   const handleSubmit = async () => {
     if (!form.equipment_id || !form.borrower_name.trim() || !form.phone_number.trim()) {
-      showToast('Sila lengkapkan borang: equipment, nama, dan telefon.', 'error')
+      showToast('Please complete the form: equipment, name, and phone number.', 'error')
       return
     }
     const qty = Math.max(1, parseInt(form.quantity, 10) || 1)
     if (selectedEquipment && qty > selectedEquipment.available_quantity) {
-      showToast(`Cuma ${selectedEquipment.available_quantity} unit tersedia untuk barang ni.`, 'error')
+      showToast(`Only ${selectedEquipment.available_quantity} units available for this item.`, 'error')
       return
     }
 
@@ -100,7 +100,7 @@ export default function BorrowPage() {
           <a href="/" style={{
             display: 'inline-block', background: 'linear-gradient(135deg, #8B0000, #a50000)', color: 'white',
             textDecoration: 'none', borderRadius: '8px', padding: '11px 24px', fontSize: '13px', fontWeight: '600',
-          }}>Kembali ke Laman Utama</a>
+          }}>Back to Home Page</a>
         </div>
       </div>
     )
@@ -124,7 +124,7 @@ export default function BorrowPage() {
           padding: '7px 14px', borderRadius: '8px', border: '1px solid #fecaca', background: '#fef2f2',
         }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
-          Kembali
+          Back
         </a>
       </nav>
 
@@ -149,8 +149,8 @@ export default function BorrowPage() {
             <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#fca5a5' }} />
             Unit Kebudayaan — UiTM Cawangan Kelantan
           </div>
-          <h1 style={{ fontSize: '26px', fontWeight: '800', color: 'white', letterSpacing: '-0.5px', marginBottom: '6px' }}>Pinjam Equipment</h1>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Isi borang di bawah -- admin akan semak & luluskan permohonan anda</p>
+          <h1 style={{ fontSize: '26px', fontWeight: '800', color: 'white', letterSpacing: '-0.5px', marginBottom: '6px' }}>Borrow Equipment</h1>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Fill out the form below -- admin will review & approve your request</p>
         </div>
       </div>
 
@@ -164,7 +164,7 @@ export default function BorrowPage() {
               onChange={(e) => setForm(p => ({ ...p, equipment_id: e.target.value, quantity: '1' }))}
               style={inputStyle}
             >
-              <option value="">-- Pilih equipment --</option>
+              <option value="">-- Select equipment --</option>
               {equipment.map(e => (
                 <option key={e.id} value={e.id}>
                   {e.code} — {e.name} ({categoryLabels[e.category] ?? e.category}) · {e.available_quantity} tersedia
@@ -172,12 +172,12 @@ export default function BorrowPage() {
               ))}
             </select>
             {equipment.length === 0 && (
-              <p style={{ fontSize: '11px', color: '#dc2626', marginTop: '4px' }}>Tiada equipment tersedia buat masa ini.</p>
+              <p style={{ fontSize: '11px', color: '#dc2626', marginTop: '4px' }}>No equipment available at the moment.</p>
             )}
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>Kuantiti <span style={{ color: '#dc2626' }}>*</span></label>
+            <label style={labelStyle}>Quantity <span style={{ color: '#dc2626' }}>*</span></label>
             <input
               type="number" min="1" max={selectedEquipment?.available_quantity ?? undefined}
               value={form.quantity}
@@ -187,32 +187,32 @@ export default function BorrowPage() {
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>Nama Penuh <span style={{ color: '#dc2626' }}>*</span></label>
-            <input type="text" placeholder="Nama penuh anda" value={form.borrower_name}
+            <label style={labelStyle}>Full Name <span style={{ color: '#dc2626' }}>*</span></label>
+            <input type="text" placeholder="Full name" value={form.borrower_name}
               onChange={(e) => setForm(p => ({ ...p, borrower_name: e.target.value }))} style={inputStyle} />
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>Jabatan / Kelab</label>
-            <input type="text" placeholder="Jabatan atau kelab anda" value={form.department}
+            <label style={labelStyle}>Department / Club</label>
+            <input type="text" placeholder="Your department or club" value={form.department}
               onChange={(e) => setForm(p => ({ ...p, department: e.target.value }))} style={inputStyle} />
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>No. Telefon <span style={{ color: '#dc2626' }}>*</span></label>
+            <label style={labelStyle}>Phone Number <span style={{ color: '#dc2626' }}>*</span></label>
             <input type="text" placeholder="012-3456789" value={form.phone_number}
               onChange={(e) => setForm(p => ({ ...p, phone_number: e.target.value }))} style={inputStyle} />
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>Jangka Tarikh Pulang</label>
+            <label style={labelStyle}>Expected Return Date</label>
             <input type="date" value={form.expected_return_date}
               onChange={(e) => setForm(p => ({ ...p, expected_return_date: e.target.value }))} style={inputStyle} />
           </div>
 
           <div style={{ marginBottom: '24px' }}>
-            <label style={labelStyle}>Catatan (opsyenal)</label>
-            <textarea rows={3} placeholder="Tujuan pinjaman, acara berkaitan, dsb." value={form.notes}
+            <label style={labelStyle}>Notes (Optional)</label>
+            <textarea rows={3} placeholder="Purpose of loan, related events, etc." value={form.notes}
               onChange={(e) => setForm(p => ({ ...p, notes: e.target.value }))} style={{ ...inputStyle, resize: 'vertical' }} />
           </div>
 
@@ -227,7 +227,7 @@ export default function BorrowPage() {
               boxShadow: loading ? 'none' : '0 2px 12px rgba(139,0,0,0.25)',
             }}
           >
-            {loading ? 'Menghantar...' : 'Hantar Permohonan'}
+            {loading ? 'Submitting...' : 'Submit Application'}
           </button>
         </div>
       </div>

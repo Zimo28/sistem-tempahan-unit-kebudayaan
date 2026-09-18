@@ -32,7 +32,7 @@ export default function EquipmentOptionsClient({ venues, options: initialOptions
 
   const addOption = async () => {
     if (!newOption.label.trim()) {
-      showToast('Sila isi nama equipment.', 'error'); return
+      showToast('Please enter an equipment name.', 'error'); return
     }
     const { data, error } = await supabase
       .from('venue_equipment_options')
@@ -47,9 +47,9 @@ export default function EquipmentOptionsClient({ venues, options: initialOptions
     if (!error && data) {
       setOptions(prev => [...prev, data])
       setNewOption({ label: '', max_quantity: '10' })
-      showToast('Equipment option ditambah!', 'success')
+      showToast('Equipment option added!', 'success')
     } else {
-      showToast('Ralat semasa menambah.', 'error')
+      showToast('Error adding equipment option.', 'error')
     }
   }
 
@@ -65,9 +65,9 @@ export default function EquipmentOptionsClient({ venues, options: initialOptions
     const { error } = await supabase.from('venue_equipment_options').update({ label, max_quantity }).eq('id', id)
     if (!error) {
       setOptions(prev => prev.map(o => o.id === id ? { ...o, label, max_quantity } : o))
-      showToast('Dikemaskini!', 'success')
+      showToast('Equipment option updated!', 'success')
     } else {
-      showToast('Ralat semasa mengemaskini.', 'error')
+      showToast('Error updating equipment option.', 'error')
     }
     setEditingId(null)
   }
@@ -86,9 +86,9 @@ export default function EquipmentOptionsClient({ venues, options: initialOptions
     const { error } = await supabase.from('venue_equipment_options').delete().eq('id', id)
     if (!error) {
       setOptions(prev => prev.filter(o => o.id !== id))
-      showToast('Dipadam.', 'success')
+      showToast('Equipment option deleted!', 'success')
     } else {
-      showToast('Ralat semasa memadam.', 'error')
+      showToast('Error deleting equipment option.', 'error')
     }
   }
 
@@ -109,8 +109,8 @@ export default function EquipmentOptionsClient({ venues, options: initialOptions
     setDraggedIndex(null)
     const updates = venueOptions.map((o, index) => ({ id: o.id, venue_id: o.venue_id, label: o.label, position: index }))
     const { error } = await supabase.from('venue_equipment_options').upsert(updates)
-    if (error) showToast('Ralat semasa kemaskini susunan.', 'error')
-    else showToast('Susunan dikemaskini!', 'success')
+    if (error) showToast('Error updating option order.', 'error')
+    else showToast('Option order updated!', 'success')
   }
 
   return (
@@ -118,7 +118,7 @@ export default function EquipmentOptionsClient({ venues, options: initialOptions
       <div style={{ marginBottom: '20px' }}>
         <h1 style={{ fontSize: '26px', fontWeight: '700', color: '#111827', letterSpacing: '-0.5px' }}>Equipment Options</h1>
         <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '4px' }}>
-          Tentukan senarai equipment (dan max quantity) yang boleh diminta dalam borang tempahan, ikut venue.
+          Define the list of equipment (and max quantity) that can be requested in the booking form, per venue.
         </p>
       </div>
 
@@ -174,8 +174,8 @@ export default function EquipmentOptionsClient({ venues, options: initialOptions
 
                 {isEditing ? (
                   <div style={{ display: 'flex', gap: '8px', flex: 1, flexWrap: 'wrap' }}>
-                    <input value={editValue.label} onChange={(e) => setEditValue(p => ({ ...p, label: e.target.value }))} style={{ ...inputStyle, flex: 1, minWidth: '140px' }} placeholder="Nama equipment" />
-                    <input type="number" min="0" value={editValue.max_quantity} onChange={(e) => setEditValue(p => ({ ...p, max_quantity: e.target.value }))} style={{ ...inputStyle, width: '100px' }} placeholder="Max qty" />
+                    <input value={editValue.label} onChange={(e) => setEditValue(p => ({ ...p, label: e.target.value }))} style={{ ...inputStyle, flex: 1, minWidth: '140px' }} placeholder="Equipment Name" />
+                    <input type="number" min="0" value={editValue.max_quantity} onChange={(e) => setEditValue(p => ({ ...p, max_quantity: e.target.value }))} style={{ ...inputStyle, width: '100px' }} placeholder="Max Quantity" />
                     <button onClick={() => saveEdit(opt.id)} style={{ background: '#8B0000', color: 'white', border: 'none', borderRadius: '6px', padding: '6px 14px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>Save</button>
                     <button onClick={() => setEditingId(null)} style={{ background: 'white', color: '#6b7280', border: '1px solid #e5e7eb', borderRadius: '6px', padding: '6px 14px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
                   </div>
@@ -213,9 +213,9 @@ export default function EquipmentOptionsClient({ venues, options: initialOptions
       {selectedVenueId && (
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
           <div style={{ flex: 2, minWidth: '180px' }}>
-            <label style={labelStyle}>Nama Equipment</label>
+            <label style={labelStyle}>Equipment Name</label>
             <input
-              type="text" placeholder="cth: Yoga Mat"
+              type="text" placeholder="e.g.: Yoga Mat"
               value={newOption.label}
               onChange={(e) => setNewOption(p => ({ ...p, label: e.target.value }))}
               style={inputStyle}
@@ -234,7 +234,7 @@ export default function EquipmentOptionsClient({ venues, options: initialOptions
             onClick={addOption}
             style={{ background: 'linear-gradient(135deg, #8B0000, #a50000)', color: 'white', border: 'none', borderRadius: '8px', padding: '9px 18px', cursor: 'pointer', fontSize: '13px', fontWeight: '600', height: '38px' }}
           >
-            Tambah
+            Add Option
           </button>
         </div>
       )}

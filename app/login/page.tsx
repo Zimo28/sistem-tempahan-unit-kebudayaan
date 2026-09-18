@@ -24,10 +24,10 @@ export default function LoginPage() {
     const email = username.includes('@') ? username : `${username}${DOMAIN}`
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
-      setError('Username atau password tidak sah.')
-      showToast('Login gagal. Semak username dan password.', 'error')
+      setError('Invalid username or password.')
+      showToast('Login failed. Please check your username and password.', 'error')
     } else {
-      showToast('Login berjaya! Selamat datang.', 'success')
+      showToast('Login successful! Welcome.', 'success')
       setTimeout(() => { window.location.href = '/admin' }, 800)
     }
     setLoading(false)
@@ -145,7 +145,7 @@ export default function LoginPage() {
           position: 'absolute', bottom: '24px',
           fontSize: '11px', color: 'rgba(255,255,255,0.2)',
           letterSpacing: '0.05em',
-        }}>© {new Date().getFullYear()} Sistem Tempahan Unit Kebudayaan</p>
+        }}>© {new Date().getFullYear()} Sistem Tempahan Unit Kebudayaan. All rights reserved.</p>
       </div>
 
       {/* Right Panel */}
@@ -181,7 +181,7 @@ export default function LoginPage() {
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <polyline points="15 18 9 12 15 6"/>
           </svg>
-          Kembali
+          Back
         </a>
 
         <div style={{
@@ -204,9 +204,9 @@ export default function LoginPage() {
             <h2 style={{
               fontSize: '26px', fontWeight: '800', color: '#111827',
               letterSpacing: '-0.5px', marginBottom: '6px',
-            }}>Log Masuk</h2>
+            }}>Login</h2>
             <p style={{ fontSize: '13px', color: '#6b7280' }}>
-              Masukkan credentials untuk akses panel admin
+              Enter your credentials to access the admin panel
             </p>
           </div>
 
@@ -340,14 +340,14 @@ export default function LoginPage() {
                 </svg>
                 Logging in...
               </>
-            ) : 'Log Masuk →'}
+            ) : 'Login →'}
           </button>
 
           <p style={{
             textAlign: 'center', fontSize: '11px', color: '#9ca3af',
             marginTop: '28px', letterSpacing: '0.03em',
           }}>
-            Hanya untuk kakitangan yang diberi kebenaran
+            Only for authorized personnel
           </p>
         </div>
       </div>

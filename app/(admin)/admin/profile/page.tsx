@@ -8,7 +8,7 @@ export default function ProfilePage() {
           Profile
         </h1>
         <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '4px' }}>
-          Kemaskini maklumat akaun admin
+          Update admin account information
         </p>
       </div>
       <div style={{

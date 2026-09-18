@@ -36,10 +36,6 @@ const tabs = [
     icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
   },
   {
-    id: 'equipment', label: 'Equipment',
-    icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-  },
-  {
     id: 'notifications', label: 'Notifications',
     icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
   },
@@ -105,9 +101,9 @@ export default function SettingsClient({
     if (!error && data) {
       setFacilities(prev => [...prev, data])
       setNewFacility('')
-      showToast('Kemudahan berjaya ditambah!', 'success')
+      showToast('Facility added successfully!', 'success')
     } else {
-      showToast('Ralat semasa menambah.', 'error')
+      showToast('Error adding facility.', 'error')
     }
   }
 
@@ -115,9 +111,9 @@ export default function SettingsClient({
     const { error } = await supabase.from('facilities').delete().eq('id', id)
     if (!error) {
       setFacilities(prev => prev.filter(f => f.id !== id))
-      showToast('Kemudahan berjaya dipadam.', 'success')
+      showToast('Facility deleted successfully!', 'success')
     } else {
-      showToast('Ralat semasa memadam.', 'error')
+      showToast('Error deleting facility.', 'error')
     }
   }
 
@@ -145,9 +141,9 @@ export default function SettingsClient({
 
     if (!error) {
       setFacilities(prev => prev.map(f => f.id === id ? { ...f, name: trimmed } : f))
-      showToast('Kemudahan berjaya dikemaskini!', 'success')
+      showToast('Facility updated successfully!', 'success')
     } else {
-      showToast('Ralat semasa mengemaskini.', 'error')
+      showToast('Error updating facility.', 'error')
     }
     setEditingId(null)
     setEditValue('')
@@ -180,15 +176,15 @@ export default function SettingsClient({
 
     const { error } = await supabase.from('facilities').upsert(updates)
     if (error) {
-      showToast('Ralat semasa kemaskini susunan.', 'error')
+      showToast('Error updating facility order.', 'error')
     } else {
-      showToast('Susunan berjaya dikemaskini!', 'success')
+      showToast('Facility order updated successfully!', 'success')
     }
   }
 
   const addVenue = async () => {
     if (!newVenue.name.trim() || !newVenue.code.trim()) {
-      showToast('Sila isi nama dan kod venue.', 'error'); return
+      showToast('Please fill in the venue name and code.', 'error'); return
     }
     const { data, error } = await supabase
       .from('venues')
@@ -204,9 +200,9 @@ export default function SettingsClient({
     if (!error && data) {
       setVenues(prev => [...prev, data])
       setNewVenue({ name: '', code: '', capacity: '' })
-      showToast('Venue berjaya ditambah!', 'success')
+      showToast('Venue added successfully!', 'success')
     } else {
-      showToast(error?.message.includes('duplicate') ? 'Kod venue tu dah wujud.' : 'Ralat semasa menambah venue.', 'error')
+      showToast(error?.message.includes('duplicate') ? 'Venue code already exists.' : 'Error adding venue.', 'error')
     }
   }
 
@@ -214,9 +210,9 @@ export default function SettingsClient({
     const { error } = await supabase.from('venues').delete().eq('id', id)
     if (!error) {
       setVenues(prev => prev.filter(v => v.id !== id))
-      showToast('Venue berjaya dipadam.', 'success')
+      showToast('Venue deleted successfully!', 'success')
     } else {
-      showToast('Tak boleh padam venue ni -- ada booking yang rujuk kat dia. Set "Tidak Aktif" je.', 'error')
+      showToast('Cannot delete this venue -- there are bookings referencing it. Just set it to "Inactive".', 'error')
     }
   }
 
@@ -227,9 +223,9 @@ export default function SettingsClient({
       .eq('id', venue.id)
     if (!error) {
       setVenues(prev => prev.map(v => v.id === venue.id ? { ...v, is_active: !v.is_active } : v))
-      showToast(venue.is_active ? 'Venue dinyahaktifkan.' : 'Venue diaktifkan semula.', 'success')
+      showToast(venue.is_active ? 'Venue deactivated.' : 'Venue reactivated.', 'success')
     } else {
-      showToast('Ralat semasa kemaskini status.', 'error')
+      showToast('Error updating venue status.', 'error')
     }
   }
 
@@ -257,9 +253,9 @@ export default function SettingsClient({
       setVenues(prev => prev.map(v => v.id === id
         ? { ...v, name, code, capacity: editVenueValue.capacity ? Number(editVenueValue.capacity) : null }
         : v))
-      showToast('Venue berjaya dikemaskini!', 'success')
+      showToast('Venue updated successfully!', 'success')
     } else {
-      showToast(error.message.includes('duplicate') ? 'Kod venue tu dah wujud.' : 'Ralat semasa mengemaskini.', 'error')
+      showToast(error.message.includes('duplicate') ? 'Venue code already exists.' : 'Error updating venue.', 'error')
     }
     cancelEditVenue()
   }
@@ -280,8 +276,8 @@ export default function SettingsClient({
     setDraggedVenueIndex(null)
     const updates = venues.map((v, index) => ({ id: v.id, name: v.name, code: v.code, position: index }))
     const { error } = await supabase.from('venues').upsert(updates)
-    if (error) showToast('Ralat semasa kemaskini susunan.', 'error')
-    else showToast('Susunan venue berjaya dikemaskini!', 'success')
+    if (error) showToast('Error updating venue order.', 'error')
+    else showToast('Venue order updated successfully!', 'success')
   }
 
   const addBlackoutDate = async () => {
@@ -617,7 +613,7 @@ export default function SettingsClient({
           <div style={{ padding: '28px' }}>
             <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#111827', marginBottom: '4px' }}>Venues</h3>
             <p style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '20px' }}>
-              Urus tempat yang boleh ditempah. Padam tak boleh kalau venue tu ada booking sedia ada -- guna toggle &quot;Tidak Aktif&quot; sebaliknya.
+              Manage venues that can be booked. You cannot delete a venue if it has existing bookings -- use the toggle &quot;Inactive&quot; instead.
             </p>
 
             {venues.map((venue, index) => (
@@ -647,28 +643,28 @@ export default function SettingsClient({
                   {editingVenueId === venue.id ? (
                     <div style={{ display: 'flex', gap: '8px', flex: 1, flexWrap: 'wrap' }}>
                       <input
-                        autoFocus type="text" placeholder="Nama venue"
+                        autoFocus type="text" placeholder="Venue Name"
                         value={editVenueValue.name}
                         onChange={(e) => setEditVenueValue(prev => ({ ...prev, name: e.target.value }))}
                         onKeyDown={(e) => { if (e.key === 'Enter') saveEditVenue(venue.id); if (e.key === 'Escape') cancelEditVenue() }}
                         style={{ fontSize: '13px', color: '#374151', flex: 2, minWidth: '120px', border: '1.5px solid #8B0000', borderRadius: '6px', padding: '5px 8px', outline: 'none' }}
                       />
                       <input
-                        type="text" placeholder="Kod"
+                        type="text" placeholder="Code"
                         value={editVenueValue.code}
                         onChange={(e) => setEditVenueValue(prev => ({ ...prev, code: e.target.value }))}
                         onKeyDown={(e) => { if (e.key === 'Enter') saveEditVenue(venue.id); if (e.key === 'Escape') cancelEditVenue() }}
                         style={{ fontSize: '13px', color: '#374151', width: '70px', border: '1.5px solid #8B0000', borderRadius: '6px', padding: '5px 8px', outline: 'none' }}
                       />
                       <input
-                        type="number" min="0" placeholder="Kapasiti"
+                        type="number" min="0" placeholder="Capacity"
                         value={editVenueValue.capacity}
                         onChange={(e) => setEditVenueValue(prev => ({ ...prev, capacity: e.target.value }))}
                         onKeyDown={(e) => { if (e.key === 'Enter') saveEditVenue(venue.id); if (e.key === 'Escape') cancelEditVenue() }}
                         style={{ fontSize: '13px', color: '#374151', width: '90px', border: '1.5px solid #8B0000', borderRadius: '6px', padding: '5px 8px', outline: 'none' }}
                       />
-                      <button onClick={() => saveEditVenue(venue.id)} style={{ fontSize: '12px', fontWeight: 600, color: 'white', background: '#8B0000', border: 'none', borderRadius: '6px', padding: '5px 12px', cursor: 'pointer' }}>Simpan</button>
-                      <button onClick={cancelEditVenue} style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', background: 'white', border: '1px solid #e5e7eb', borderRadius: '6px', padding: '5px 12px', cursor: 'pointer' }}>Batal</button>
+                      <button onClick={() => saveEditVenue(venue.id)} style={{ fontSize: '12px', fontWeight: 600, color: 'white', background: '#8B0000', border: 'none', borderRadius: '6px', padding: '5px 12px', cursor: 'pointer' }}>Save</button>
+                      <button onClick={cancelEditVenue} style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', background: 'white', border: '1px solid #e5e7eb', borderRadius: '6px', padding: '5px 12px', cursor: 'pointer' }}>Cancel</button>
                     </div>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
@@ -690,7 +686,7 @@ export default function SettingsClient({
                       onClick={() => toggleVenueActive(venue)}
                       style={{ fontSize: '11px', fontWeight: 600, color: venue.is_active ? '#6b7280' : '#16a34a', background: 'white', border: '1px solid #e5e7eb', borderRadius: '6px', padding: '5px 10px', cursor: 'pointer' }}
                     >
-                      {venue.is_active ? 'Nyahaktifkan' : 'Aktifkan'}
+                      {venue.is_active ? 'Unactivate' : 'Activate'}
                     </button>
                     <button
                       onClick={() => startEditVenue(venue)}
@@ -723,21 +719,21 @@ export default function SettingsClient({
 
             <div style={{ display: 'flex', gap: '10px', marginTop: '14px', flexWrap: 'wrap' }}>
               <input
-                type="text" placeholder="Nama venue (e.g. Bilik Seminar)"
+                type="text" placeholder="Venue Name (e.g. Seminar Room)"
                 value={newVenue.name}
                 onChange={(e) => setNewVenue(prev => ({ ...prev, name: e.target.value }))}
-                style={{ ...inputStyle, flex: 2, minWidth: '160px' }}
+                style={{ ...inputStyle, flex: 2, minWidth: '140px' }}
                 onFocus={(e) => e.target.style.borderColor = '#8B0000'} onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
               />
               <input
-                type="text" placeholder="Kod (e.g. SEM-A)"
+                type="text" placeholder="Code (e.g. CUTE)"
                 value={newVenue.code}
                 onChange={(e) => setNewVenue(prev => ({ ...prev, code: e.target.value }))}
-                style={{ ...inputStyle, width: '120px' }}
+                style={{ ...inputStyle, width: '140px' }}
                 onFocus={(e) => e.target.style.borderColor = '#8B0000'} onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
               />
               <input
-                type="number" min="0" placeholder="Kapasiti"
+                type="number" min="0" placeholder="Capacity"
                 value={newVenue.capacity}
                 onChange={(e) => setNewVenue(prev => ({ ...prev, capacity: e.target.value }))}
                 style={{ ...inputStyle, width: '110px' }}
@@ -750,44 +746,8 @@ export default function SettingsClient({
                   borderRadius: '8px', padding: '0 18px', cursor: 'pointer', fontSize: '13px', fontWeight: 600,
                 }}
               >
-                Tambah
+                Add Venue
               </button>
-            </div>
-          </div>
-        )}
-
-        {/* Equipment Tab */}
-        {activeTab === 'equipment' && (
-          <div style={{ padding: '28px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#111827', marginBottom: '20px' }}>Equipment Settings</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }} className="equipment-grid">
-              {[
-                { 
-                  label: 'Max Microphone', key: 'max_microphone',
-                  icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-                },
-                { 
-                  label: 'Max Air-cond', key: 'max_aircond',
-                  icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>
-                },
-                { 
-                  label: 'Max PA System', key: 'max_pa_system',
-                  icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                },
-                { 
-                  label: 'Max LCD Projector', key: 'max_lcd_projector',
-                  icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><path d="M17 2l-5 5-5-5"/></svg>
-                },
-              ].map((item) => (
-                <div key={item.key}>
-                  <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ color: '#9ca3af' }}>{item.icon}</span>
-                    {item.label}
-                  </label>
-                  <input type="number" min="0" max="10" value={settings[item.key] ?? '1'} onChange={(e) => updateSetting(item.key, e.target.value)} style={inputStyle}
-                    onFocus={(e) => e.target.style.borderColor = '#8B0000'} onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
-                </div>
-              ))}
             </div>
           </div>
         )}
@@ -814,7 +774,7 @@ export default function SettingsClient({
                   onFocus={(e) => e.target.style.borderColor = '#8B0000'} onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
               </div>
               <div>
-                <label style={labelStyle}>phone_number</label>
+                <label style={labelStyle}>Phone Number</label>
                 <input type="text" value={settings['contact_phone'] ?? ''} onChange={(e) => updateSetting('contact_phone', e.target.value)} style={inputStyle}
                   onFocus={(e) => e.target.style.borderColor = '#8B0000'} onBlur={(e) => e.target.style.borderColor = '#e5e7eb'} />
               </div>

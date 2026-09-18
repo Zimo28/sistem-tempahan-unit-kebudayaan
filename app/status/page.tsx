@@ -62,7 +62,7 @@ export default function StatusPage() {
             background: '#fef2f2', transition: 'all 0.15s',
           }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
-            Kembali
+            Back
           </Link>
         </div>
       </nav>
@@ -88,8 +88,8 @@ export default function StatusPage() {
             <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#fca5a5' }} />
             Unit Kebudayaan — UiTM Cawangan Kelantan
           </div>
-          <h1 style={{ fontSize: '26px', fontWeight: '800', color: 'white', letterSpacing: '-0.5px', marginBottom: '6px' }}>Semak Status Tempahan</h1>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Masukkan nombor telefon untuk semak status tempahan anda</p>
+          <h1 style={{ fontSize: '26px', fontWeight: '800', color: 'white', letterSpacing: '-0.5px', marginBottom: '6px' }}>Check Booking Status</h1>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Enter your phone number to check the status of your booking</p>
         </div>
       </div>
 
@@ -97,9 +97,9 @@ export default function StatusPage() {
       <div style={{ background: 'white', borderBottom: '1px solid #f3f4f6', padding: '12px 16px', overflowX: 'auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', minWidth: 'max-content', margin: '0 auto' }}>
           {[
-            { num: '1', label: 'Masukkan Nombor Telefon' },
-            { num: '2', label: 'Cari' },
-            { num: '3', label: 'Lihat Status' },
+            { num: '1', label: 'Enter Phone Number' },
+            { num: '2', label: 'Search' },
+            { num: '3', label: 'View Status' },
           ].map((step, i) => (
             <div key={step.num} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -117,7 +117,7 @@ export default function StatusPage() {
         <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
           <input
             type="tel"
-            placeholder="cth: 012-3456789"
+            placeholder="e.g.: 012-3456789"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -135,7 +135,7 @@ export default function StatusPage() {
             border: 'none', borderRadius: '10px', padding: '12px 24px', fontSize: '14px', fontWeight: '600',
             cursor: loading ? 'not-allowed' : 'pointer',
             boxShadow: loading ? 'none' : '0 2px 12px rgba(139,0,0,0.2)',
-          }}>{loading ? '...' : 'Cari'}</button>
+          }}>{loading ? '...' : 'Search'}</button>
         </div>
 
         {searched && (
@@ -144,7 +144,7 @@ export default function StatusPage() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
-              Tiada rekod untuk &quot;<strong>{searchQuery}</strong>&quot;
+              No records found for &quot;<strong>{searchQuery}</strong>&quot;
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -171,9 +171,9 @@ export default function StatusPage() {
                       {b.start_time} – {b.end_time}
                     </p>
                     <p style={{ fontSize: '13px', color: cfg.color, fontWeight: '500', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      {b.status === 'approved' && (<><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Tempahan telah diluluskan.</>)}
-                      {b.status === 'pending' && (<><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Sedang dalam semakan admin.</>)}
-                      {b.status === 'rejected' && (<><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Tidak diluluskan. Sila hubungi admin.</>)}
+                      {b.status === 'approved' && (<><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Booking approved.</>)}
+                      {b.status === 'pending' && (<><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending admin review.</>)}
+                      {b.status === 'rejected' && (<><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Not approved. Please contact admin.</>)}
                     </p>
                   </div>
                 )

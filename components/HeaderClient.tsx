@@ -439,7 +439,7 @@ export default function HeaderClient({ userName, role }: { userName: string; rol
 
                 <div style={{ height: '1px', background: '#f3f4f6', margin: '4px 0' }} />
 
-                {/* Log Keluar */}
+                {/* Logout */}
                 <button
                   onClick={handleLogout}
                   style={{
@@ -457,7 +457,7 @@ export default function HeaderClient({ userName, role }: { userName: string; rol
                     <polyline points="16 17 21 12 16 7"/>
                     <line x1="21" y1="12" x2="9" y2="12"/>
                   </svg>
-                  Log Keluar
+                  Logout
                 </button>
               </div>
             </div>

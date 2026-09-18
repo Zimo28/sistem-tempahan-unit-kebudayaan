@@ -223,7 +223,7 @@ function BookingContent() {
         slot.start_time < b.end_time && slot.end_time > b.start_time
       )
       if (hasDbConflict) {
-        problems.push({ index: i, reason: 'Bertindih dengan tempahan lain yang sedia ada' })
+        problems.push({ index: i, reason: 'Overlaps with an existing booking' })
         continue
       }
 
@@ -233,7 +233,7 @@ function BookingContent() {
         slot.start_time < other.end_time && slot.end_time > other.start_time
       )
       if (clashesWithOwnSlot) {
-        problems.push({ index: i, reason: 'Bertindih dengan slot lain dalam tempahan ini' })
+        problems.push({ index: i, reason: 'Overlaps with another slot in this booking' })
         continue
       }
 
@@ -244,7 +244,7 @@ function BookingContent() {
         .single()
 
       if (blackout) {
-        problems.push({ index: i, reason: `Tarikh blackout${blackout.reason ? ` — ${blackout.reason}` : ''}` })
+        problems.push({ index: i, reason: `Blackout date${blackout.reason ? ` — ${blackout.reason}` : ''}` })
       }
     }
 
@@ -253,27 +253,27 @@ function BookingContent() {
 
   const handleSubmit = async () => {
     if (!form.venue_id) {
-      showToast('Sila pilih tempat/venue.', 'error'); return
+      showToast('Please select a venue.', 'error'); return
     }
     if (!form.full_name || !form.phone_number || !form.organization || !form.event_name) {
-      showToast('Sila isi semua maklumat peribadi.', 'error'); return
+      showToast('Please fill in all personal information.', 'error'); return
     }
     const phoneRegex = /^(\+?60|0)[0-9]{8,10}$/
     if (!phoneRegex.test(form.phone_number.replace(/[-\s]/g, ''))) {
-      showToast('Format nombor telefon tidak sah. Contoh: 012-3456789', 'error'); return
+      showToast('Invalid phone number format. Example: 012-3456789', 'error'); return
     }
 
     for (const slot of slots) {
       if (!slot.booking_date || !slot.start_time || !slot.end_time) {
-        showToast('Sila isi tarikh dan masa untuk semua slot.', 'error'); return
+        showToast('Please fill in the date and time for all slots.', 'error'); return
       }
       if (slot.start_time >= slot.end_time) {
-        showToast('Masa tamat mesti lebih lewat dari masa mula untuk setiap slot.', 'error'); return
+        showToast('End time must be later than start time for each slot.', 'error'); return
       }
     }
 
     if (!file) {
-      showToast('Sila muat naik dokumen kelulusan (PDF) sebelum menghantar.', 'error'); return
+      showToast('Please upload the approval document (PDF) before submitting.', 'error'); return
     }
 
     setLoading(true)
@@ -285,7 +285,7 @@ function BookingContent() {
       const firstProblem = problems[0]
       const slotDate = slots[firstProblem.index].booking_date
       showToast(
-        `Slot ${firstProblem.index + 1} (${slotDate}): ${firstProblem.reason}. Sila semak slot yang ditanda merah.`,
+        `Slot ${firstProblem.index + 1} (${slotDate}): ${firstProblem.reason}. Please check the highlighted slot.`,
         'error'
       )
       setLoading(false)
@@ -314,7 +314,7 @@ function BookingContent() {
       .from('bookings').insert(rowsToInsert).select()
 
     if (error) {
-      showToast('Ralat semasa menghantar. Sila cuba lagi.', 'error')
+      showToast('Error occurred while submitting. Please try again.', 'error')
       setLoading(false)
       return
     }
@@ -399,7 +399,7 @@ function BookingContent() {
           <a href="/"><img src="/logo.png" alt="Unit Kebudayaan" style={{ height: '44px', width: 'auto', objectFit: 'contain' }} /></a>
           <a href="/" style={{ fontSize: '13px', color: '#6b7280', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
-            Kembali ke Laman Utama
+            Back to Home
           </a>
         </nav>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
@@ -410,9 +410,9 @@ function BookingContent() {
                 <polyline points="22 4 12 14.01 9 11.01"/>
               </svg>
             </div>
-            <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#111827', marginBottom: '10px' }}>Tempahan Dihantar!</h2>
+            <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#111827', marginBottom: '10px' }}>Booking Submitted!</h2>
             <p style={{ color: '#6b7280', fontSize: '14px', lineHeight: '1.7' }}>
-              Tempahan anda ({slots.length} slot) sedang menunggu kelulusan admin. Anda akan dihubungi sekiranya ada pertanyaan.
+              Your booking ({slots.length} slot) is pending admin approval. You will be contacted if there are any questions.
             </p>
             <div style={{ display: 'flex', gap: '10px', marginTop: '28px', flexDirection: 'column' }}>
               <button
@@ -423,9 +423,9 @@ function BookingContent() {
                   setExpandedSlotIndex(0)
                 }}
                 style={{ background: 'linear-gradient(135deg, #8B0000, #a50000)', color: 'white', border: 'none', borderRadius: '10px', padding: '12px 32px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', boxShadow: '0 4px 12px rgba(139,0,0,0.25)' }}
-              >Buat Tempahan Baru</button>
+              >Create New Booking</button>
               <a href="/" style={{ display: 'block', padding: '12px', borderRadius: '10px', border: '1px solid #e5e7eb', fontSize: '14px', fontWeight: '500', color: '#6b7280', textDecoration: 'none', textAlign: 'center' }}>
-                ← Kembali ke Laman Utama
+                ← Back to Home
               </a>
             </div>
           </div>
@@ -453,7 +453,7 @@ function BookingContent() {
             background: '#fef2f2', transition: 'all 0.15s',
           }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
-            Kembali
+            Back
           </a>
         </div>
       </nav>
@@ -621,7 +621,7 @@ function BookingContent() {
                           onClick={(e) => { e.stopPropagation(); removeSlot(index) }}
                           style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: '11px', fontWeight: '600', flexShrink: 0 }}
                         >
-                          Buang Slot
+                          Remove Slot
                         </button>
                       )}
                     </div>
@@ -676,7 +676,7 @@ function BookingContent() {
                           </div>
                         ) : (
                           <p style={{ fontSize: '12px', color: '#9ca3af' }}>
-                            {form.venue_id ? 'Tiada equipment tersedia untuk venue ini.' : 'Pilih venue dahulu untuk lihat equipment.'}
+                            {form.venue_id ? 'No equipment available for this venue.' : 'Please select a venue to view available equipment.'}
                           </p>
                         )}
                       </>
@@ -695,7 +695,7 @@ function BookingContent() {
                   marginBottom: '12px',
                 }}
               >
-                + Tambah Hari / Slot Lain
+                + Add Day / Other Slot
               </button>
 
               <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', padding: '10px 12px', fontSize: '12px', color: '#92400e', display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
@@ -734,7 +734,7 @@ function BookingContent() {
                   e.preventDefault(); setDragOver(false)
                   const dropped = e.dataTransfer.files?.[0]
                   if (dropped?.type === 'application/pdf') setFile(dropped)
-                  else showToast('Hanya fail PDF dibenarkan.', 'error')
+                  else showToast('Only PDF files are allowed.', 'error')
                 }}
                 style={{
                   border: `2px dashed ${dragOver ? '#8B0000' : '#e5e7eb'}`,
@@ -756,7 +756,7 @@ function BookingContent() {
                   <input type="file" accept=".pdf" style={{ display: 'none' }} onChange={(e) => {
                     const selected = e.target.files?.[0]
                     if (selected?.type === 'application/pdf') setFile(selected)
-                    else showToast('Hanya fail PDF dibenarkan.', 'error')
+                    else showToast('Only PDF files are allowed.', 'error')
                   }} />
                 </label>
               </div>
@@ -783,9 +783,9 @@ function BookingContent() {
                   <polyline points="23 4 23 10 17 10"/>
                   <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
                 </svg>
-                Menghantar...
+                Submitting...
               </>
-            ) : `Hantar Tempahan${slots.length > 1 ? ` (${slots.length} slot)` : ''} →`}
+            ) : `Submit Booking${slots.length > 1 ? ` (${slots.length} slot)` : ''} →`}
           </button>
         </div>
       </div>

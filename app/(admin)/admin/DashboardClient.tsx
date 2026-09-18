@@ -323,7 +323,7 @@ export default function DashboardClient({
       {/* Venue Filter */}
       {venues.length > 1 && (
         <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '12px', fontWeight: '600', color: '#6b7280' }}>Tapis ikut venue:</span>
+          <span style={{ fontSize: '12px', fontWeight: '600', color: '#6b7280' }}>Filter by venue:</span>
           <button
             onClick={() => setVenueFilter('all')}
             style={{
@@ -333,7 +333,7 @@ export default function DashboardClient({
               color: venueFilter === 'all' ? 'white' : '#374151',
             }}
           >
-            Semua Venue
+            All Venues
           </button>
           {venues.map(v => (
             <button
