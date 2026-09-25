@@ -433,7 +433,7 @@ export default function BookingClient({ bookings: initial, venues }: { bookings:
           <p class="para"><span class="num">5.</span>Tuan/puan diminta membawa surat ini semasa program berlangsung sebagai bukti pengesahan tempahan. Sebarang pertanyaan lanjut bolehlah dikemukakan kepada pihak pengurusan Unit Kebudayaan.</p>
 
           <p class="closing">Sekian, harap maklum dan terima kasih.</p>
-          <p class="motto">"BERKHIDMAT UNTUK NEGARA"</p>
+          <p class="motto">"UNIT KEBUDAYAAN"</p>
 
           <div class="sign-block">
             <p>Yang menjalankan tugas,</p>
